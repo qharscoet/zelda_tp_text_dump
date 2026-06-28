@@ -253,28 +253,39 @@ impl Message {
                                 }
                             },
                             0xFF => {
-                                if tag.number == 0 { // change color
-                                    let new_color = tag.payload[0] as usize;
-                                    if current_color != 0 {
-                                        res_str += "</span>";
-                                    }
-                                    if new_color != 0 {
-                                        res_str += &format!("<span style='color:{};'>", COLORS_RGB[new_color]);
-                                    }
-                                    current_color = new_color;
-                                } else if tag.number == 1 {
-                                    println!("{}", tag);
-                                    let new_size = get_u16_from_payload(&tag.payload, 0);
-                                    
-                                    println!("curr_size : {}, new_size : {}", current_size, new_size);
-                                    if current_size != 100 {
-                                        res_str += "</span>"
-                                    }
-                                    if new_size != 100 {
-                                        res_str += &format!("<span style='font-size:{}%;'>", new_size);
-                                    }
-            
-                                    current_size = new_size;
+                                match tag.number {
+                                    0x00 => { // change color
+                                        let new_color = tag.payload[0] as usize;
+                                        if current_color != 0 {
+                                            res_str += "</span>";
+                                        }
+                                        if new_color != 0 {
+                                            res_str += &format!("<span style='color:{};'>", COLORS_RGB[new_color]);
+                                        }
+                                        current_color = new_color;
+                                    },
+                                    0x01 => {
+                                        println!("{}", tag);
+                                        let new_size = get_u16_from_payload(&tag.payload, 0);
+                                        
+                                        println!("curr_size : {}, new_size : {}", current_size, new_size);
+                                        if current_size != 100 {
+                                            res_str += "</span>"
+                                        }
+                                        if new_size != 100 {
+                                            res_str += &format!("<span style='font-size:{}%;'>", new_size);
+                                        }
+                
+                                        current_size = new_size;
+                                    },
+                                    0x02 => {
+                                        // todo!()
+                                        let over_count = tag.payload[0];
+                                        let raw_shiftjs : Vec<_>= tag.payload[1..].iter().map(|v| *v).collect();
+                                        let decoded_ruby = encoding_rs::SHIFT_JIS.decode(&raw_shiftjs).0;
+                                        println!("{}", decoded_ruby);
+                                    },
+                                    _ => {}
                                 }
                             }
                             _ => {}
