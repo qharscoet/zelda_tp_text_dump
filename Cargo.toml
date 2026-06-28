@@ -1,0 +1,8 @@
+[package]
+name = "bmg_parser"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+itertools = "0.15.0"
+regex = "1.12.4"
