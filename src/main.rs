@@ -147,30 +147,137 @@ impl Message {
                 match part {
                     TextPart::Text(text) => res_str += text,
                     TextPart::Tag(tag) => {
-                        if tag.group == 0xFF {
-                            if tag.number == 0 { // change color
-                                let new_color = tag.payload[0] as usize;
-                                if current_color != 0 {
-                                    res_str += "</span>";
+                        match tag.group {
+                            0x00 => {
+                                res_str += match tag.number {
+                                    0x08 => "• ",
+                                    0x09 => "• ",
+                                    0x0A => "[A] ",
+                                    0x0B => "[B] ",
+                                    0x0C => "[C] ",
+                                    0x0D => "[L] ",
+                                    0x0E => "[R] ",
+                                    0x0F => "[X] ",
+                                    0x10 => "[Y] ",
+                                    0x11 => "[Z] ",
+                                    0x12 => "[DPad] ",
+                                    0x13 => "[Analog] ",
+                                    0x14 => "🡄 ",
+                                    0x15 => "🡆 ",
+                                    0x16 => "🡅 ",
+                                    0x17 => "🡇 ",
+                                    0x18 => "[AnalogUp] ",
+                                    0x19 => "[AnalogDown] ",
+                                    0x1A => "[AnalogLeft] ",
+                                    0x1B => "[AnalogRight] ",
+                                    0x1C => "[AnalogVertical] ",
+                                    0x1D => "[AnalogHorizontal] ",
+                                    0x23 => "[RedTarget] ",
+                                    0x24 => "[YellowTarget] ",
+                                    0x2E => "[XorY] ",
+                                    0x39 => "♥ ",
+                                    0x00 =>	"[Link]",
+                                    0x22 =>	"[Epona]",
+                                    0x29 =>	"[CurrentScent]",
+                                    0x2B =>	"[WarpingTo]",
+                                    0x2D =>	"[Bomb-Name]",
+                                    0x31 =>	"[Bomb-Count]",
+                                    0x32 =>	"[Bomb-Price]",
+                                    0x35 =>	"[nop000035]",
+                                    0x37 =>	"[Bombcap]",
+                                    0x3B =>	"[ReturnedBug]",
+                                    0x3C =>	"[LetterSender]",
+                                    0x3E =>	"[CurrentLetterPage]",
+                                    0x3F =>	"[MaxLetterPage]",
+                                    _ => ""
+                                };
+                            },
+                            0x03 => {
+                                res_str += match tag.number {
+
+                                    0x01 =>	"[WiiA]",
+                                    0x02 =>	"[WiiB]",
+                                    0x03 =>	"[WiiHome]",
+                                    0x04 =>	"[WiiMinu]",
+                                    0x05 =>	"[WiiPlus]",
+                                    0x06 =>	"[Wii1]",
+                                    0x07 =>	"[Wii2]",
+                                    0x08 =>	"[WiiD-WE]",
+                                    0x09 =>	"[WiiD-N]",
+                                    0x0A =>	"[WiiD-S]",
+                                    0x0B =>	"[WiiD-WE]",
+                                    0x0C =>	"[WiiD-E]",
+                                    0x0D =>	"[WiiD-W]",
+                                    0x0E =>	"[Wiimote]",
+                                    0x0F =>	"[Weticul]",
+                                    0x10 =>	"[Wunchuc]",
+                                    0x11 =>	"[Wiimote]",
+                                    0x12 =>	"[Fairy]",
+                                    0x13 =>	"[WiiC]",
+                                    0x14 =>	"[WiiZ]",
+                                    _ => ""
+                                };
+                            },
+                            0x04 => {
+                                res_str += match tag.number {
+                                    0x00 =>	"巫",
+                                    0x01 =>	"嗅",
+                                    0x02 =>	"眷",
+                                    0x03 =>	"蜀",
+                                    0x04 =>	"蟲",
+                                    0x05 =>	"裔",
+                                    0x06 =>	"惧",
+                                    0x07 =>	"綺",
+                                    0x08 =>	"罠",
+                                    0x09 =>	"祓",
+                                    0x0A =>	"墟",
+                                    0x0B =>	"絆",
+                                    0x0C =>	"僭",
+                                    0x0D =>	"憑",
+                                    _ => ""
                                 }
-                                if new_color != 0 {
-                                    res_str += &format!("<span style='color:{};'>", COLORS_RGB[new_color]);
+                            },
+                            0x06 => {
+                                res_str += match tag.number {
+                                    0x02 => "♂",	
+                                    0x03 => "♀",	
+                                    0x04 => "★",	
+                                    0x05 => "※",	
+                                    0x06 => "←",	
+                                    0x07 => "→",	
+                                    0x08 => "↑",	
+                                    0x09 => "↓",	
+                                    0x0A => "⧫",
+                                    0x0B => " ",    
+                                    _ => "",
                                 }
-                                current_color = new_color;
-                            } else if tag.number == 1 {
-                                println!("{}", tag);
-                                let new_size = get_u16_from_payload(&tag.payload, 0);
-                                
-                                println!("curr_size : {}, new_size : {}", current_size, new_size);
-                                if current_size != 100 {
-                                    res_str += "</span>"
+                            },
+                            0xFF => {
+                                if tag.number == 0 { // change color
+                                    let new_color = tag.payload[0] as usize;
+                                    if current_color != 0 {
+                                        res_str += "</span>";
+                                    }
+                                    if new_color != 0 {
+                                        res_str += &format!("<span style='color:{};'>", COLORS_RGB[new_color]);
+                                    }
+                                    current_color = new_color;
+                                } else if tag.number == 1 {
+                                    println!("{}", tag);
+                                    let new_size = get_u16_from_payload(&tag.payload, 0);
+                                    
+                                    println!("curr_size : {}, new_size : {}", current_size, new_size);
+                                    if current_size != 100 {
+                                        res_str += "</span>"
+                                    }
+                                    if new_size != 100 {
+                                        res_str += &format!("<span style='font-size:{}%;'>", new_size);
+                                    }
+            
+                                    current_size = new_size;
                                 }
-                                if new_size != 100 {
-                                    res_str += &format!("<span style='font-size:{}%;'>", new_size);
-                                }
-        
-                                current_size = new_size;
                             }
+                            _ => {}
                         }
                     }
                 }                
