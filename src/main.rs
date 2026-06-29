@@ -142,10 +142,25 @@ impl Message {
 
             let mut current_color = 0;
             let mut current_size = 100;
+
+            let mut needs_ruby : Option<(u8, String)> = None;
             // for (s, tag) in str_it.zip(tags_it) {
             for part in str_it.interleave(tags_it) {
                 match part {
-                    TextPart::Text(text) => res_str += text,
+                    TextPart::Text(text) => {
+                        if text != "" {
+                            if let Some((over_count, ruby_text)) = needs_ruby {
+                                let mut chars = text.chars();
+                                let base_text : String = chars.by_ref().take(over_count as usize).collect();
+                                let remaining_text : String = chars.collect();
+                                println!("base_text : {}, ruby_text : {}, remaining_text : {}", base_text, ruby_text, remaining_text);
+                                res_str += &format!("<ruby>{}<rp>(</rp><rt>{}</rt><rp>)</rp></ruby>{}", base_text, ruby_text, remaining_text);
+                                needs_ruby = None;
+                            } else {
+                                res_str += text;
+                            }
+                        }
+                    },
                     TextPart::Tag(tag) => {
                         match tag.group {
                             0x00 => {
@@ -283,7 +298,8 @@ impl Message {
                                         let over_count = tag.payload[0];
                                         let raw_shiftjs : Vec<_>= tag.payload[1..].iter().map(|v| *v).collect();
                                         let decoded_ruby = encoding_rs::SHIFT_JIS.decode(&raw_shiftjs).0;
-                                        println!("{}", decoded_ruby);
+                                        needs_ruby = Some((over_count, decoded_ruby.to_string()));
+                                        //println!("{}", decoded_ruby);
                                     },
                                     _ => {}
                                 }
