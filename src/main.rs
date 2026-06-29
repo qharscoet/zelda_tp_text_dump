@@ -1,5 +1,5 @@
 use std::{f32::consts::E, fmt, fs::File, io::{BufRead, BufReader, Write}, path::Path};
-use regex::Regex;
+use regex::{Captures, Regex};
 use std::sync::LazyLock;
 use itertools::Itertools;
 
@@ -129,6 +129,118 @@ struct Tag {
     payload : Vec<u8>
 }
 
+impl Tag {
+    
+    fn get_simple_replacement(&self) -> &str {
+        match self.group {
+            0x00 => {
+                match self.number {
+                    0x08 => "• ",
+                    0x09 => "• ",
+                    0x0A => "[A] ",
+                    0x0B => "[B] ",
+                    0x0C => "[C] ",
+                    0x0D => "[L] ",
+                    0x0E => "[R] ",
+                    0x0F => "[X] ",
+                    0x10 => "[Y] ",
+                    0x11 => "[Z] ",
+                    0x12 => "[DPad] ",
+                    0x13 => "[Analog] ",
+                    0x14 => "🡄 ",
+                    0x15 => "🡆 ",
+                    0x16 => "🡅 ",
+                    0x17 => "🡇 ",
+                    0x18 => "[AnalogUp] ",
+                    0x19 => "[AnalogDown] ",
+                    0x1A => "[AnalogLeft] ",
+                    0x1B => "[AnalogRight] ",
+                    0x1C => "[AnalogVertical] ",
+                    0x1D => "[AnalogHorizontal] ",
+                    0x23 => "[RedTarget] ",
+                    0x24 => "[YellowTarget] ",
+                    0x2E => "[XorY] ",
+                    0x39 => "♥ ",
+                    0x00 =>	"[Link]",
+                    0x22 =>	"[Epona]",
+                    0x29 =>	"[CurrentScent]",
+                    0x2B =>	"[WarpingTo]",
+                    0x2D =>	"[Bomb-Name]",
+                    0x31 =>	"[Bomb-Count]",
+                    0x32 =>	"[Bomb-Price]",
+                    0x35 =>	"[nop000035]",
+                    0x37 =>	"[Bombcap]",
+                    0x3B =>	"[ReturnedBug]",
+                    0x3C =>	"[LetterSender]",
+                    0x3E =>	"[CurrentLetterPage]",
+                    0x3F =>	"[MaxLetterPage]",
+                    _ => ""
+                }
+            },
+            0x03 => {
+                match self.number {
+                    0x01 =>	"[WiiA]",
+                    0x02 =>	"[WiiB]",
+                    0x03 =>	"[WiiHome]",
+                    0x04 =>	"[WiiMinus]",
+                    0x05 =>	"[WiiPlus]",
+                    0x06 =>	"[Wii1]",
+                    0x07 =>	"[Wii2]",
+                    0x08 =>	"[WiiD-WE]",
+                    0x09 =>	"[WiiD-N]",
+                    0x0A =>	"[WiiD-S]",
+                    0x0B =>	"[WiiD-WE]",
+                    0x0C =>	"[WiiD-E]",
+                    0x0D =>	"[WiiD-W]",
+                    0x0E =>	"[Wiimote]",
+                    0x0F =>	"[WReticule]",
+                    0x10 =>	"[WNunchunk]",
+                    0x11 =>	"[Wiimote]",
+                    0x12 =>	"[Fairy]",
+                    0x13 =>	"[WiiC]",
+                    0x14 =>	"[WiiZ]",
+                    _ => ""
+                }
+            },
+            0x04 => {
+                match self.number {
+                    0x00 =>	"巫",
+                    0x01 =>	"嗅",
+                    0x02 =>	"眷",
+                    0x03 =>	"蜀",
+                    0x04 =>	"蟲",
+                    0x05 =>	"裔",
+                    0x06 =>	"惧",
+                    0x07 =>	"綺",
+                    0x08 =>	"罠",
+                    0x09 =>	"祓",
+                    0x0A =>	"墟",
+                    0x0B =>	"絆",
+                    0x0C =>	"僭",
+                    0x0D =>	"憑",
+                    _ => ""
+                }
+            },
+            0x06 => {
+                match self.number {
+                    0x02 => "♂",	
+                    0x03 => "♀",	
+                    0x04 => "★",	
+                    0x05 => "※",	
+                    0x06 => "←",	
+                    0x07 => "→",	
+                    0x08 => "↑",	
+                    0x09 => "↓",	
+                    0x0A => "⧫",
+                    0x0B => " ",    
+                    _ => "",
+                }
+            },
+            _=> "",
+        }
+    }
+}
+
 impl fmt::Display for Tag {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f,"{:0>2X}/{:0>4X} payload : {:X?}", self.group, self.number, self.payload)
@@ -217,110 +329,6 @@ impl Message {
                     },
                     TextPart::Tag(tag) => {
                         match tag.group {
-                            0x00 => {
-                                res_str += match tag.number {
-                                    0x08 => "• ",
-                                    0x09 => "• ",
-                                    0x0A => "[A] ",
-                                    0x0B => "[B] ",
-                                    0x0C => "[C] ",
-                                    0x0D => "[L] ",
-                                    0x0E => "[R] ",
-                                    0x0F => "[X] ",
-                                    0x10 => "[Y] ",
-                                    0x11 => "[Z] ",
-                                    0x12 => "[DPad] ",
-                                    0x13 => "[Analog] ",
-                                    0x14 => "🡄 ",
-                                    0x15 => "🡆 ",
-                                    0x16 => "🡅 ",
-                                    0x17 => "🡇 ",
-                                    0x18 => "[AnalogUp] ",
-                                    0x19 => "[AnalogDown] ",
-                                    0x1A => "[AnalogLeft] ",
-                                    0x1B => "[AnalogRight] ",
-                                    0x1C => "[AnalogVertical] ",
-                                    0x1D => "[AnalogHorizontal] ",
-                                    0x23 => "[RedTarget] ",
-                                    0x24 => "[YellowTarget] ",
-                                    0x2E => "[XorY] ",
-                                    0x39 => "♥ ",
-                                    0x00 =>	"[Link]",
-                                    0x22 =>	"[Epona]",
-                                    0x29 =>	"[CurrentScent]",
-                                    0x2B =>	"[WarpingTo]",
-                                    0x2D =>	"[Bomb-Name]",
-                                    0x31 =>	"[Bomb-Count]",
-                                    0x32 =>	"[Bomb-Price]",
-                                    0x35 =>	"[nop000035]",
-                                    0x37 =>	"[Bombcap]",
-                                    0x3B =>	"[ReturnedBug]",
-                                    0x3C =>	"[LetterSender]",
-                                    0x3E =>	"[CurrentLetterPage]",
-                                    0x3F =>	"[MaxLetterPage]",
-                                    _ => ""
-                                };
-                            },
-                            0x03 => {
-                                res_str += match tag.number {
-
-                                    0x01 =>	"[WiiA]",
-                                    0x02 =>	"[WiiB]",
-                                    0x03 =>	"[WiiHome]",
-                                    0x04 =>	"[WiiMinu]",
-                                    0x05 =>	"[WiiPlus]",
-                                    0x06 =>	"[Wii1]",
-                                    0x07 =>	"[Wii2]",
-                                    0x08 =>	"[WiiD-WE]",
-                                    0x09 =>	"[WiiD-N]",
-                                    0x0A =>	"[WiiD-S]",
-                                    0x0B =>	"[WiiD-WE]",
-                                    0x0C =>	"[WiiD-E]",
-                                    0x0D =>	"[WiiD-W]",
-                                    0x0E =>	"[Wiimote]",
-                                    0x0F =>	"[Weticul]",
-                                    0x10 =>	"[Wunchuc]",
-                                    0x11 =>	"[Wiimote]",
-                                    0x12 =>	"[Fairy]",
-                                    0x13 =>	"[WiiC]",
-                                    0x14 =>	"[WiiZ]",
-                                    _ => ""
-                                };
-                            },
-                            0x04 => {
-                                res_str += match tag.number {
-                                    0x00 =>	"巫",
-                                    0x01 =>	"嗅",
-                                    0x02 =>	"眷",
-                                    0x03 =>	"蜀",
-                                    0x04 =>	"蟲",
-                                    0x05 =>	"裔",
-                                    0x06 =>	"惧",
-                                    0x07 =>	"綺",
-                                    0x08 =>	"罠",
-                                    0x09 =>	"祓",
-                                    0x0A =>	"墟",
-                                    0x0B =>	"絆",
-                                    0x0C =>	"僭",
-                                    0x0D =>	"憑",
-                                    _ => ""
-                                }
-                            },
-                            0x06 => {
-                                res_str += match tag.number {
-                                    0x02 => "♂",	
-                                    0x03 => "♀",	
-                                    0x04 => "★",	
-                                    0x05 => "※",	
-                                    0x06 => "←",	
-                                    0x07 => "→",	
-                                    0x08 => "↑",	
-                                    0x09 => "↓",	
-                                    0x0A => "⧫",
-                                    0x0B => " ",    
-                                    _ => "",
-                                }
-                            },
                             0xFF => {
                                 match tag.number {
                                     0x00 => { // change color
@@ -356,7 +364,7 @@ impl Message {
                                     _ => {}
                                 }
                             }
-                            _ => {}
+                            _ => { res_str += tag.get_simple_replacement(); }
                         }
                     }
                 }                
@@ -371,7 +379,7 @@ impl Message {
         let raw = &self.text[lang_id];
         let s = raw.replace(r"\n", "\n");
        
-        RE_TAG.replace_all(&s, "").to_string()
+        RE_TAG.replace_all(&s, |c : &Captures| c[0].parse::<Tag>().unwrap_or_default().get_simple_replacement().to_owned()).to_string()
     }
 
     fn print_tags(&self, lang_id : usize) {        
@@ -436,18 +444,42 @@ impl Exporter for HTMLExporter  {
     
     fn begin(&mut self) {
         if let Some(f) = &mut self.file {
-            let _ = f.write(b"<!DOCTYPE html>
+            let _ = f.write("<!DOCTYPE html>
 <html>
 <head>
 <style>
+@font-face {
+        font-family: 'fot-rodin_prondb';
+        src: url(\"assets/FOT-RodinProN-DB.otf\");
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    @font-face {
+        font-family: 'reishotai';
+        src: url(\"assets/Reishotai.otf\");
+        font-weight: normal;
+        font-style: normal;
+        size-adjust: 120%;
+    }
+
+    rt {
+        color : white;
+        font-family: 'reishotai', 'ＭＳ 明朝', serif;
+    }
+
+    header {
+            text-align:center;
+        }
+
   table {
     table-layout: fixed;
     width: 100%;
-    border: 1px solid red;
     overflow:auto;
+    font-family: 'fot-rodin_prondb';
     
 }
-    th, td {
+    td {
     color: white;
     border: 1px solid white;
     background: rgb(0 0 0 / 90%);
@@ -461,7 +493,10 @@ tr {
 </style>
 </head>
 <body>
-<table>");
+<header>
+  <img src=\"https://www.nintendo.com/jp/character/zelda/history/img/branch-c/02/pc/logo.png\"/>
+</header>
+<table>".as_bytes());
         }
         
     }
@@ -490,10 +525,10 @@ tr {
                 0x00 => "", //TODO : add dark background
                 0x01 => "", // no background
                 0x07 => "style='text-align: center;'",
-                0x0C => "style='font-family: \"ＭＳ 明朝\", serif;'",
+                0x0C => "style='font-family: 'reishotai', 'ＭＳ 明朝', serif;",
                 0x0D => "style='color:#b4c8e6;'",
                 0x0E => "style='color:#aadc8c;'",
-                0x13 => "style='text-align: center; font-family: \"ＭＳ 明朝\", serif;'",
+                0x13 => "style='text-align: center; font-family: \"reishotai\", \"ＭＳ 明朝\", serif;'",
                 _ => ""
             };
             let mut s  = format!("<tr {display_style}>");
