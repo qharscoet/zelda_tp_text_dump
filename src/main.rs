@@ -438,6 +438,7 @@ impl Exporter for HTMLExporter  {
         if let Ok(f) = File::create(filepath) {
             HTMLExporter { file: Some(f) }
         } else {
+            println!("Can't open {}", filepath.display());
             HTMLExporter {file: None}
         }
     }
@@ -564,6 +565,7 @@ impl Exporter for CSVExporter {
         if let Ok(f) = File::create(filepath) {
             CSVExporter { file: Some(f) }
         } else {
+            println!("Can't open {}", filepath.display());
             CSVExporter {file: None}
         }
     }
@@ -698,12 +700,7 @@ fn main() {
         process_language(lang_idx,lang, &mut parser);
     }
 
-    //parser.print();
 
-    parser.export_html(Path::new("test.html"), false);
-    parser.export_csv(Path::new("test.csv"));
-
-    println!("{:?}", parser.msgs[0][0x7e9]);
-    parser.msgs[0][0x7e9].print_tags(0);
-    println!("{}", parser.msgs[0][0x7e9].attribs);
+    parser.export_html(Path::new("index.html"), false);
+    parser.export_csv(Path::new("textdump.csv"));
 }
