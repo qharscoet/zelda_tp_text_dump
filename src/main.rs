@@ -17,14 +17,14 @@ const FILENAMES : [&str;BANK_COUNT] = [
     "zel_99",
 ];
 
-const LANGUAGES_COUNT : usize = 3;
+const LANGUAGES_COUNT : usize = 4;
 
 const LANGUAGES : [&str;LANGUAGES_COUNT] = [
     "jp",
     "us",
     "fr",
     // "sp",
-    // "de",
+    "de",
     // "it"
 ];
 
@@ -33,7 +33,7 @@ const LANGUAGES_FULL : [&str;LANGUAGES_COUNT] = [
     "US English",
     "French",
     // "Spanish",
-    // "German",
+    "German",
     // "Italian"
 ];
 
@@ -367,6 +367,13 @@ impl Message {
         
     }
 
+    fn get_raw(&self, lang_id : usize) -> String {
+        let raw = &self.text[lang_id];
+        let s = raw.replace(r"\n", "\n");
+       
+        RE_TAG.replace_all(&s, "").to_string()
+    }
+
     fn print_tags(&self, lang_id : usize) {        
         let tags_it = RE_TAG.find_iter(&self.text[lang_id]).flat_map(|m| m.as_str().parse::<Tag>()).map(|t| TextPart::Tag(t));
         let str_it = RE_TAG.split(&self.text[lang_id]).map(|s| TextPart::Text(s));
@@ -512,6 +519,55 @@ tr {
     
 }
 
+struct CSVExporter {
+    file: Option<File>
+}
+
+
+impl Exporter for CSVExporter {
+    fn new(filepath: &Path) -> Self {
+        if let Ok(f) = File::create(filepath) {
+            CSVExporter { file: Some(f) }
+        } else {
+            CSVExporter {file: None}
+        }
+    }
+
+    fn begin(&mut self) {
+       
+    }
+
+    fn set_headers(&mut self) {
+        if let Some(f) = &mut self.file {
+            let mut s = "".to_string();
+
+            for lang in LANGUAGES_FULL {
+                s +=  &format!("{};", lang);
+            }
+            s += "\n";
+            let _ = f.write(s.as_bytes());
+        }
+
+    }
+
+    fn add_row(&mut self , msg : &Message, _ : bool) {
+        if let Some(f) = &mut self.file {
+            let mut s =  "".to_string();
+    
+            for i in 0..LANGUAGES_COUNT {
+                s += &format!("\"{}\";", msg.get_raw(i));
+            }
+
+            s += "\n";
+    
+            let _ = f.write(s.as_bytes());
+        }
+    }
+
+    fn end(&mut self) {
+        
+    }
+}
 impl BMGParser {
     fn feed_line(&mut self, line: &str, lang_idx : usize, bank_id : usize) { 
         //println!("{}", line);
@@ -558,6 +614,20 @@ impl BMGParser {
         }
         exporter.end();
     }
+
+    fn export_csv(&self, filepath: &Path ) {
+        
+        let mut exporter = CSVExporter::new(filepath);
+        exporter.begin();
+        exporter.set_headers();
+
+        for bank in &self.msgs {
+            for msg in bank.iter().filter(|msg| !msg.is_empty()) {
+                exporter.add_row(msg, true);
+            }
+        }
+        exporter.end();
+    }
 }
 
 fn process_file(lines : impl Iterator<Item=std::string::String>, lang_id : usize, bank_id : usize, parser : &mut BMGParser) {
@@ -596,6 +666,7 @@ fn main() {
     //parser.print();
 
     parser.export_html(Path::new("test.html"), false);
+    parser.export_csv(Path::new("test.csv"));
 
     println!("{:?}", parser.msgs[0][0x7e9]);
     parser.msgs[0][0x7e9].print_tags(0);
