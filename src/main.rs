@@ -464,10 +464,15 @@ impl Exporter for HTMLExporter  {
         size-adjust: 120%;
     }
 
-    rt {
+    body rt {
         color : white;
         font-family: 'reishotai', 'ＭＳ 明朝', serif;
     }
+
+    body.nofuri rt {
+        display:none;
+    }
+
 
     header {
             text-align:center;
@@ -497,6 +502,10 @@ tr {
 <header>
   <img src=\"https://www.nintendo.com/jp/character/zelda/history/img/branch-c/02/pc/logo.png\"/>
 </header>
+<div id=\"options\">
+    <input id=\"hide-furi\" type=\"checkbox\" name=\"HideFuri\" />
+    <label for=\"HideFuri\">Hide Japanese Furigana</label>
+</div>
 <table>".as_bytes());
         }
         
@@ -548,6 +557,14 @@ tr {
         if let Some(f) = &mut self.file {
             let _ = f.write(b"</tbody>
 </table>
+<script> 
+
+const nofuriCheckbox = document.querySelector('#hide-furi');
+    nofuriCheckbox.addEventListener('change', () => {
+    document.querySelector('body').classList.toggle('nofuri', nofuriCheckbox.checked );
+});
+
+</script>
 </body>
 </html>");
         }
