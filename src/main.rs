@@ -438,8 +438,17 @@ impl Exporter for HTMLExporter  {
     width: 100%;
     border: 1px solid red;
     overflow:auto;
+    
 }
-    tr {
+    th, td {
+    color: white;
+    border: 1px solid white;
+    background: rgb(0 0 0 / 90%);
+    border-radius: 10px;
+    padding:1em;
+    }
+
+tr {
     height: 48px;
 }
 </style>
@@ -471,7 +480,7 @@ impl Exporter for HTMLExporter  {
     fn add_row(&mut self, msg : &Message, ignore_tags : bool) {
         if let Some(f) = &mut self.file {
             let display_style = match msg.attribs.get_display_style() {
-                0x00 => "style='color:{};'", //TODO : add dark background
+                0x00 => "", //TODO : add dark background
                 0x01 => "", // no background
                 0x07 => "style='text-align: center;'",
                 0x0C => "style='font-family: \"ＭＳ 明朝\", serif;'",
