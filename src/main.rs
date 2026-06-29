@@ -1,4 +1,4 @@
-use std::{fmt, fs::File, io::{BufRead, BufReader, Write}, path::Path};
+use std::{f32::consts::E, fmt, fs::File, io::{BufRead, BufReader, Write}, path::Path};
 use regex::Regex;
 use std::sync::LazyLock;
 use itertools::Itertools;
@@ -64,6 +64,64 @@ fn get_u16_from_payload(payload : &[u8], idx : usize) -> u16 {
     ((v1 as u16) << 8 | v2 as u16) as u16 
 }
 
+#[derive(Debug)]
+struct MessageAttributes {
+    payload : [u8; 16],
+}
+
+
+impl MessageAttributes {
+    fn get_message_id(&self) -> u16 {
+        get_u16_from_payload(&self.payload, 0)
+    }
+
+    fn get_display_style(&self) -> u8 {
+        self.payload[0x05]
+    }
+
+    fn get_printing_style(&self) -> u8 {
+        self.payload[0x06]
+    }
+
+    fn is_empty(&self) -> bool {
+        self.payload.iter().all(|v| *v == 0)
+    }
+}
+
+impl Default for MessageAttributes {
+    fn default() -> Self {
+        MessageAttributes { payload: [0;16]}
+    }
+}
+
+impl fmt::Display for MessageAttributes {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f,"{:X?}", self.payload)
+    }
+}
+
+impl std::str::FromStr for MessageAttributes {
+    type Err = &'static str;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let mut values = s.split_inclusive(&[',', '/']).fold(Vec::new(), |mut acc, s| {
+            if s.ends_with(',') {
+                acc.push(u8::from_str_radix(&s[0..s.len() -1], 16).unwrap_or_default());
+            } else if s.ends_with('/') {
+                acc.push(u8::from_str_radix(&s[0..s.len() -1], 16).unwrap_or_default());
+                let curr_len = acc.len();
+                let next_len = ((curr_len + 4)/4) * 4; //align to next 32
+                acc.resize(next_len, 0);
+
+            } else {
+                acc.push(u8::from_str_radix(s, 16).unwrap_or_default());
+            };
+            acc
+        });
+        values.resize(16, 0);
+        Ok(MessageAttributes { payload: values.try_into().unwrap_or([0;16])})
+    }
+}
+
 #[derive(Debug, Default)]
 struct Tag {
     group : u8,
@@ -108,7 +166,7 @@ impl std::str::FromStr for Tag {
 #[derive(Debug)]
 struct Message {
     text : [String; LANGUAGES_COUNT],
-    attribs : String,
+    attribs : MessageAttributes,
     id : usize
 }
 
@@ -131,9 +189,6 @@ impl Message {
         if ignore_tags {
             RE_TAG.replace_all(&s, "").to_string()
         } else {
-            let tags_it = RE_TAG.find_iter(&self.text[lang_id]).flat_map(|m| m.as_str().parse::<Tag>());
-            let str_it = RE_TAG.split(&s);
-
             let tags_it = RE_TAG.find_iter(&self.text[lang_id]).flat_map(|m| m.as_str().parse::<Tag>()).map(|t| TextPart::Tag(t));
             let str_it = RE_TAG.split(&s).map(|s| TextPart::Text(s));
 
@@ -153,7 +208,6 @@ impl Message {
                                 let mut chars = text.chars();
                                 let base_text : String = chars.by_ref().take(over_count as usize).collect();
                                 let remaining_text : String = chars.collect();
-                                println!("base_text : {}, ruby_text : {}, remaining_text : {}", base_text, ruby_text, remaining_text);
                                 res_str += &format!("<ruby>{}<rp>(</rp><rt>{}</rt><rp>)</rp></ruby>{}", base_text, ruby_text, remaining_text);
                                 needs_ruby = None;
                             } else {
@@ -280,10 +334,8 @@ impl Message {
                                         current_color = new_color;
                                     },
                                     0x01 => {
-                                        println!("{}", tag);
+
                                         let new_size = get_u16_from_payload(&tag.payload, 0);
-                                        
-                                        println!("curr_size : {}, new_size : {}", current_size, new_size);
                                         if current_size != 100 {
                                             res_str += "</span>"
                                         }
@@ -333,7 +385,7 @@ impl fmt::Display for Message {
 
 impl Default for Message {
     fn default() -> Self {
-        Message { text: Default::default(), attribs: String::new(), id : 0}
+        Message { text: Default::default(), attribs: MessageAttributes::default(), id : 0}
     }
 }
 
@@ -380,6 +432,17 @@ impl Exporter for HTMLExporter  {
             let _ = f.write(b"<!DOCTYPE html>
 <html>
 <head>
+<style>
+  table {
+    table-layout: fixed;
+    width: 100%;
+    border: 1px solid red;
+    overflow:auto;
+}
+    tr {
+    height: 48px;
+}
+</style>
 </head>
 <body>
 <table>");
@@ -407,7 +470,17 @@ impl Exporter for HTMLExporter  {
 
     fn add_row(&mut self, msg : &Message, ignore_tags : bool) {
         if let Some(f) = &mut self.file {
-            let mut s  = "<tr>".to_string();
+            let display_style = match msg.attribs.get_display_style() {
+                0x00 => "style='color:{};'", //TODO : add dark background
+                0x01 => "", // no background
+                0x07 => "style='text-align: center;'",
+                0x0C => "style='font-family: \"ＭＳ 明朝\", serif;'",
+                0x0D => "style='color:#b4c8e6;'",
+                0x0E => "style='color:#aadc8c;'",
+                0x13 => "style='text-align: center; font-family: \"ＭＳ 明朝\", serif;'",
+                _ => ""
+            };
+            let mut s  = format!("<tr {display_style}>");
     
             for i in 0..LANGUAGES_COUNT {
                 s += &format!("<td>{}</td>\n", msg.get_html_formatted(i, ignore_tags));
@@ -444,8 +517,8 @@ impl BMGParser {
                 self.msgs[bank_id][idx].id = id;
 
                 if self.msgs[bank_id][idx].attribs.is_empty() {
-                    let attribs = &groups["attribs"];
-                    self.msgs[bank_id][idx].attribs = attribs.to_string();
+                    let attribs = &groups["attribs"][1..groups["attribs"].len()-1];
+                    self.msgs[bank_id][idx].attribs = attribs.parse().unwrap_or_default()
                 }
 
                 if let Some(str) = groups.name("str")
@@ -515,6 +588,7 @@ fn main() {
 
     parser.export_html(Path::new("test.html"), false);
 
-    println!("{:?}", parser.msgs[0][0x7e9].text[0]);
+    println!("{:?}", parser.msgs[0][0x7e9]);
     parser.msgs[0][0x7e9].print_tags(0);
+    println!("{}", parser.msgs[0][0x7e9].attribs);
 }
