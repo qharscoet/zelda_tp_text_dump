@@ -221,6 +221,22 @@ impl Tag {
                     _ => ""
                 }
             },
+            0x05 => {
+                match self.number {
+                    0x00 =>	"[Time]",
+                    0x03 =>	if self.payload[0] == 0  {"[ReturnedBugs]" } else {"[RemainingBugs]"},
+                    0x04 =>	"noop",
+                    0x07 =>	"[RiverPoints]",
+                    0x08 =>	"[FishLength]",
+                    0x09 =>	"[MartGoalLef]",
+                    0x0A =>	"[LetterCount]",
+                    0x0B =>	"[PoesNeeded]",
+                    0x0C =>	if self.payload[0] == 0 {"[LatestScore]" } else {"[HighScore]"},
+                    0x0D =>	"[FishCount]",
+                    0x0E =>	"[RollGoal]",
+                    _ => ""
+                }
+            },
             0x06 => {
                 match self.number {
                     0x02 => "♂",	
@@ -622,6 +638,7 @@ impl Exporter for CSVExporter {
         
     }
 }
+
 impl BMGParser {
     fn feed_line(&mut self, line: &str, lang_idx : usize, bank_id : usize) { 
         //println!("{}", line);

@@ -6105,8 +6105,8 @@ Abstand zum Fernseher.";
 "忘れられた里";"Hidden Village";"Village oublié";"Vergessenes Dorf";
 "スノーピーク";"Peak Province";"Massif Pics Blancs";"Schneeland";
 "ゲルド砂漠";"Desert Province";"Désert Gerudo";"Gerudo-Wüste";
-"";"";"";"";
-"";"";"";"";
+"[FishLength]";"[FishLength]";"[FishLength]";"[FishLength]";
+"[FishCount]";"[FishCount]";"[FishCount]";"[FishCount]";
 "トアルナマズ";"Ordon Catfish";"Silure de Toal";"Ordonwels";
 "ニオイマス";"Reekfish";"Truite fétide";"Dunstforelle";
 "ハイリアパイク";"Hylian Pike";"Brochet d'Hylia";"Hyliahecht";
@@ -6580,19 +6580,19 @@ Attaque Circulaire (donnez une petite
 secousse latérale avec le Nunchuk).";"Führe mithilfe des Nunchuk eine Wirbel-
 attacke aus, solange deine Herzleiste voll
 ist.";
-"グリーンギル（）を
+"グリーンギル（[FishLength]）を
 釣り上げた！
 どこでも見かける雑魚の一種
 釣り上げた魚はＳＴＡＲＴを押して
 コレクト＆装備画面で確認できる
-たくさん釣れるので　[A] で逃がしてやろう";"You caught a greengill ()!
+たくさん釣れるので　[A] で逃がしてやろう";"You caught a greengill ([FishLength])!
 These small fries are everywhere.
 
 
 Press START to check the fish
 you've caught on the Collection
 screen.";"Vous avez attrapé un
-goujon de !
+goujon de [FishLength]!
 Du fretin que l'on trouve partout.
 
 Appuyez sur START pour admirer
@@ -6601,34 +6601,34 @@ poissons que vous avez pêchés.
 
 Vous pouvez en pêcher à foison, ce
 n'est pas la peine de le garder.
-Appuyez sur [A]  pour le relâcher.";"Eine Grünkieme ()!
+Appuyez sur [A]  pour le relâcher.";"Eine Grünkieme ([FishLength])!
 Ein beliebter Fisch, den man
 überall finden kann.
 
 Drücke START, um deinen Fang
 auf dem Ausrüstungsbildschirm
 zu begutachten.";
-"グリーンギル（）を釣り上げた！
+"グリーンギル（[FishLength]）を釣り上げた！
 どこでも見かける雑魚の一種
-たくさん釣れるので　[A] で逃がしてやろう";"You caught a greengill ()!
+たくさん釣れるので　[A] で逃がしてやろう";"You caught a greengill ([FishLength])!
 These small fries are everywhere.
 You can catch these whenever you
 want, so let this one go.";"Vous avez attrapé un goujon
-de !
+de [FishLength]!
 Du fretin que l'on trouve partout.
 
 Vous pouvez en pêcher à foison, ce
 n'est pas la peine de le garder.
-Appuyez sur [A]  pour le relâcher.";"Eine Grünkieme ()!
+Appuyez sur [A]  pour le relâcher.";"Eine Grünkieme ([FishLength])!
 Ein beliebter Fisch, den man
 überall finden kann. Drücke [A] , um
 ihn freizulassen.";
-"グリーンギル（）を
+"グリーンギル（[FishLength]）を
 釣り上げた！
 どこでも見かける雑魚の一種
 サイズは新記録！
 ウキ釣り日誌の記録が更新された
-たくさん釣れるので　[A] で逃がしてやろう";"You caught a greengill ()!
+たくさん釣れるので　[A] で逃がしてやろう";"You caught a greengill ([FishLength])!
 These small fries are everywhere.
 
 
@@ -6636,7 +6636,7 @@ This one sets a new size record!
 The record in the fish journal
 has been updated. Let the little
 guy go with [A] .";"Vous avez attrapé un goujon
-de !
+de [FishLength]!
 Du fretin que l'on trouve partout.
 
 Vous avez établi un nouveau
@@ -6645,7 +6645,7 @@ au coup a été mis à jour.
 
 Vous pouvez en pêcher à foison, ce
 n'est pas la peine de le garder.
-Appuyez sur [A]  pour le relâcher.";"Eine Grünkieme ()!
+Appuyez sur [A]  pour le relâcher.";"Eine Grünkieme ([FishLength])!
 Ein beliebter Fisch, den man
 überall finden kann. 
 
@@ -6653,12 +6653,12 @@ Der bisher größte seiner Art.
 Der Rekord in deinem Fangbuch
 wurde aktualisiert. Drücke [A] ,
 um ihn freizulassen.";
-"ハイラルバス（）
+"ハイラルバス（[FishLength]）
 を釣り上げた！
 釣り好きの間では定番の魚
 釣り上げた魚はＳＴＡＲＴを押して
 コレクト＆装備画面で確認できる
-いつでも釣れるので　[A] で逃がしてやろう";"That's a Hyrule bass ()!
+いつでも釣れるので　[A] で逃がしてやろう";"That's a Hyrule bass ([FishLength])!
 For fishing enthusiasts, this fish
 is one of the basics. 
 
@@ -6666,7 +6666,7 @@ Press START to check the fish
 you've caught on the Collection
 screen. Let this little guy go
 with [A] .";"Vous avez attrapé une
-perche d'Hyrule de !
+perche d'Hyrule de [FishLength]!
 Le poisson de base
 de l'amateur de pêche.
 Appuyez sur START pour admirer
@@ -6676,39 +6676,39 @@ poissons que vous avez pêchés.
 Vous pouvez en pêcher quand vous
 voulez, ce n'est pas la peine de
 le garder. Appuyez sur [A]  pour
-le relâcher.";"Ein Hyrulebarsch ()!
+le relâcher.";"Ein Hyrulebarsch ([FishLength])!
 Standardfang für Petrijünger!
 
 
 Drücke START, um deinen Fang
 auf dem Ausrüstungsbildschirm
 zu begutachten.";
-"ハイラルバス（）
+"ハイラルバス（[FishLength]）
 を釣り上げた！
 
 釣り好きの間では定番の魚
-いつでも釣れるので　[A] で逃がしてやろう";"That's a Hyrule bass ()!
+いつでも釣れるので　[A] で逃がしてやろう";"That's a Hyrule bass ([FishLength])!
 
 
 
 For fishing enthusiasts, this fish
 is one of the basics. Let this little
 guy go with [A] .";"Vous avez attrapé une
-perche d'Hyrule de !
+perche d'Hyrule de [FishLength]!
 Le poisson de base
 de l'amateur de pêche.
 Vous pouvez en pêcher quand vous
 voulez, ce n'est pas la peine de
 le garder. Appuyez sur [A]  pour
-le relâcher.";"Ein Hyrulebarsch ()!
+le relâcher.";"Ein Hyrulebarsch ([FishLength])!
 Standardfang für Petrijünger!
 Drücke [A] , um ihn freizulassen.";
-"ハイラルバス（）
+"ハイラルバス（[FishLength]）
 を釣り上げた！
 釣り好きの間では定番の魚
 サイズは新記録！
 ウキ釣り日誌の記録が更新された
-いつでも釣れるので　[A] で逃がしてやろう";"That's a Hyrule bass ()!
+いつでも釣れるので　[A] で逃がしてやろう";"That's a Hyrule bass ([FishLength])!
 For fishing enthusiasts, this fish
 is one of the basics. 
  
@@ -6716,7 +6716,7 @@ This one sets a new size record!
 The record in the fish journal
 has been updated. Let this guy
 go with [A] .";"Vous avez attrapé une
-perche d'Hyrule de !
+perche d'Hyrule de [FishLength]!
 Le poisson de base
 de l'amateur de pêche.
 Vous avez établi un nouveau
@@ -6726,7 +6726,7 @@ au coup a été mis à jour.
 Vous pouvez en pêcher quand vous
 voulez, ce n'est pas la peine de
 le garder. Appuyez sur [A]  pour
-le relâcher.";"Ein Hyrulebarsch ()!
+le relâcher.";"Ein Hyrulebarsch ([FishLength])!
 Standardfang für Petrijünger!
 
 
@@ -6734,51 +6734,51 @@ Der bisher größte seiner Art!
 Der Rekord in deinem Fangbuch
 wurde aktualisiert. Drücke [A] , um
 ihn freizulassen.";
-"ハイリアパイク（）
+"ハイリアパイク（[FishLength]）
 を釣り上げた！
 最近、人気があるらしい
 釣り上げた魚はＳＴＡＲＴを押して
 コレクト＆装備画面で確認できる
-[A] で逃がしてやろう";"That's a Hylian pike ()!
+[A] で逃がしてやろう";"That's a Hylian pike ([FishLength])!
 These have been gaining in
 popularity lately.
 
 Press START to check the fish
 you've caught on the Collection
 screen. Release it with [A] .";"Vous avez attrapé un
-brochet d'Hylia de !
+brochet d'Hylia de [FishLength]!
 Un poisson très à
 la mode en ce moment.
 Appuyez sur START pour admirer
 sur l'écran de quête tous les
 poissons que vous avez pêchés.
-Appuyez sur [A]  pour le relâcher.";"Ein Hyliahecht ()!
+Appuyez sur [A]  pour le relâcher.";"Ein Hyliahecht ([FishLength])!
 Zurzeit soll dieser Fisch
 ja sehr beliebt sein!
 
 Drücke START, um deinen Fang
 auf dem Ausrüstungsbildschirm
 zu begutachten.";
-"ハイリアパイク（）
+"ハイリアパイク（[FishLength]）
 を釣り上げた！
 
 最近、人気があるらしい
-[A] で逃がしてやろう";"That's a Hylian pike ()!
+[A] で逃がしてやろう";"That's a Hylian pike ([FishLength])!
 These have been gaining in
 popularity lately. Release it with [A] .";"Vous avez attrapé un
-brochet d'Hylia de !
+brochet d'Hylia de [FishLength]!
 Un poisson très à
 la mode en ce moment.
-Appuyez sur [A]  pour le relâcher.";"Ein Hyliahecht ()!
+Appuyez sur [A]  pour le relâcher.";"Ein Hyliahecht ([FishLength])!
 Zurzeit soll dieser Fisch ja sehr
 beliebt sein! Drücke [A] , um ihn
 freizulassen.";
-"ハイリアパイク（）
+"ハイリアパイク（[FishLength]）
 を釣り上げた！
 最近、人気があるらしい
 サイズは新記録！
 ウキ釣り日誌の記録が更新された
-[A] で逃がしてやろう";"That's a Hylian pike ()!
+[A] で逃がしてやろう";"That's a Hylian pike ([FishLength])!
 These have been gaining in
 popularity lately.
 
@@ -6786,13 +6786,13 @@ This one sets a new size record!
 The record in the fish journal
 has been updated. Release it with
 [A] .";"Vous avez attrapé un
-brochet d'Hylia de !
+brochet d'Hylia de [FishLength]!
 Un poisson très à
 la mode en ce moment.
 Vous avez établi un nouveau
 record! Votre carnet de pêche
 au coup a été mis à jour.
-Appuyez sur [A]  pour le relâcher.";"Ein Hyliahecht ()!
+Appuyez sur [A]  pour le relâcher.";"Ein Hyliahecht ([FishLength])!
 Zurzeit soll dieser Fisch
 ja sehr beliebt sein!
 
@@ -6800,12 +6800,12 @@ Der bisher größte seiner Art!
 Der Rekord in deinem Fangbuch
 wurde aktualisiert. Drücke [A] ,
 um ihn freizulassen.";
-"ハイラルドジョウ（）
+"ハイラルドジョウ（[FishLength]）
 を釣り上げた！
 伝説と言われる魚の幼魚だ・・・
 釣り上げた魚はＳＴＡＲＴを押して
 コレクト＆装備画面で確認できる
-[A] で逃がして　成魚に育ってから釣ろう";"That's a Hylian loach ()!
+[A] で逃がして　成魚に育ってから釣ろう";"That's a Hylian loach ([FishLength])!
 It's the fry of a legendary fish...
 
 
@@ -6813,7 +6813,7 @@ Press START to check the fish
 you've caught on the Collection
 screen. Release this one with [A] 
 and catch it when it's grown!";"Vous avez attrapé une
-loche d'Hyrule de !
+loche d'Hyrule de [FishLength]!
 C'est un jeune de ce
 poisson légendaire...
 Appuyez sur START pour admirer
@@ -6822,39 +6822,39 @@ poissons que vous avez pêchés.
 
 Appuyez sur [A]  pour le relâcher,
 vous l'attraperez quand il aura
-grandi...";"Eine Hyrulegrundel ()!
+grandi...";"Eine Hyrulegrundel ([FishLength])!
 Bei Anglern gilt dieser Fisch
 schon fast als legendär...
 
 Drücke START, um deinen Fang
 auf dem Ausrüstungsbildschirm
 zu begutachten.";
-"ハイラルドジョウ（）
+"ハイラルドジョウ（[FishLength]）
 を釣り上げた！
 
 伝説と言われる魚の幼魚だ・・・
-[A] で逃がして　成魚に育ってから釣ろう";"That's a Hylian loach ()!
+[A] で逃がして　成魚に育ってから釣ろう";"That's a Hylian loach ([FishLength])!
 It's the fry of a legendary fish...
 
 
 Release this one with [A]  and
 catch it when it's grown!";"Vous avez attrapé une
-loche d'Hyrule de !
+loche d'Hyrule de [FishLength]!
 
 
 C'est un jeune de ce
 poisson légendaire... Appuyez
 sur [A]  pour le relâcher, vous
-l'attraperez quand il aura grandi...";"Eine Hyrulegrundel ()!
+l'attraperez quand il aura grandi...";"Eine Hyrulegrundel ([FishLength])!
 Bei Anglern gilt dieser Fisch
 schon fast als legendär... Drücke
 [A] , um ihn freizulassen.";
-"ハイラルドジョウ（）
+"ハイラルドジョウ（[FishLength]）
 を釣り上げた！
 伝説と言われる魚の幼魚だ・・・
 サイズは新記録！
 ウキ釣り日誌の記録が更新された
-[A] で逃がして　成魚に育ってから釣ろう";"That's a Hylian loach ()!
+[A] で逃がして　成魚に育ってから釣ろう";"That's a Hylian loach ([FishLength])!
 It's the fry of a legendary fish...
 
 
@@ -6862,7 +6862,7 @@ This one sets a new size record!
 The record in the fish journal
 has been updated. Release it with
 [A]  and catch it when it's grown!";"Vous avez attrapé une
-loche d'Hyrule de !
+loche d'Hyrule de [FishLength]!
 C'est un jeune de ce
 poisson légendaire...
 Vous avez établi un nouveau
@@ -6871,7 +6871,7 @@ au coup a été mis à jour.
 
 Appuyez sur [A]  pour le relâcher,
 vous l'attraperez quand il aura
-grandi...";"Eine Hyrulegrundel ()!
+grandi...";"Eine Hyrulegrundel ([FishLength])!
 Bei Anglern gilt dieser Fisch
 schon fast als legendär...
 
@@ -6879,25 +6879,25 @@ Der bisher größte seiner Art!
 Der Rekord in deinem Fangbuch
 wurde aktualisiert. Drücke [A] ,
 um ihn freizulassen.";
-"トアルナマズ（）を
+"トアルナマズ（[FishLength]）を
 釣り上げた！
 [Link]と同じ　トアル出身！
 釣り上げた魚はＳＴＡＲＴを押して
 コレクト＆装備画面で確認できる
-[A] で逃がしてやろう";"That's an Ordon catfish ()!
+[A] で逃がしてやろう";"That's an Ordon catfish ([FishLength])!
 From Ordon like [Link]!
 
 
 Press START to check the fish
 you've caught on the Collection
 screen. Release this one with [A] .";"Vous avez attrapé un
-silure de Toal de !
+silure de Toal de [FishLength]!
 Il vient de la même région
 que vous, [Link]!
 Appuyez sur START pour admirer
 sur l'écran de quête tous les
 poissons que vous avez pêchés.
-Appuyez sur [A]  pour le relâcher.";"Ein Ordonwels ()!
+Appuyez sur [A]  pour le relâcher.";"Ein Ordonwels ([FishLength])!
 Heimisch in Ordon... Genau
 wie du!
 
@@ -6905,27 +6905,27 @@ Drücke START, um deinen Fang
 auf dem Ausrüstungsbildschirm
 zu begutachten. Lass ihn frei durch
 Drücken von [A] .";
-"トアルナマズ（）を
+"トアルナマズ（[FishLength]）を
 釣り上げた！
 
 [Link]と同じ　トアル出身！
-[A] で逃がしてやろう";"That's an Ordon catfish ()!
+[A] で逃がしてやろう";"That's an Ordon catfish ([FishLength])!
 From Ordon like [Link]!
 
 
 Release this one with [A] .";"Vous avez attrapé un
-silure de Toal de !
+silure de Toal de [FishLength]!
 Il vient de la même région
 que vous, [Link]!
-Appuyez sur [A]  pour le relâcher.";"Ein Ordonwels ()!
+Appuyez sur [A]  pour le relâcher.";"Ein Ordonwels ([FishLength])!
 Heimisch in Ordon... Genau wie du!
 Drücke [A] , um ihn freizulassen.";
-"トアルナマズ（）を
+"トアルナマズ（[FishLength]）を
 釣り上げた！
 [Link]と同じ　トアル出身！
 サイズは新記録！
 ウキ釣り日誌の記録が更新された
-[A] で逃がしてやろう";"That's an Ordon catfish ()!
+[A] で逃がしてやろう";"That's an Ordon catfish ([FishLength])!
 From Ordon like [Link]!
 
 
@@ -6933,13 +6933,13 @@ This one sets a new size record!
 The record in the fish journal
 has been updated. Release this one
 with [A] .";"Vous avez attrapé un
-silure de Toal de !
+silure de Toal de [FishLength]!
 Il vient de la même région
 que vous, [Link]!
 Vous avez établi un nouveau
 record! Votre carnet de pêche
 au coup a été mis à jour.
-Appuyez sur [A]  pour le relâcher.";"Ein Ordonwels ()!
+Appuyez sur [A]  pour le relâcher.";"Ein Ordonwels ([FishLength])!
 Heimisch in Ordon... Genau
 wie du!
 
@@ -7152,19 +7152,19 @@ Da es verboten ist, ihn zu
 fangen, erhält er keinen Eintrag
 im Fangbuch. Drücke [A] , um
 ihn freizulassen.";
-"ニオイマス（）を
+"ニオイマス（[FishLength]）を
 釣り上げた！
 ゾーラの里でしか見られない珍しい魚
 かなり強烈に　においます・・・
 釣り上げた魚はＳＴＡＲＴを押して
-コレクト＆装備画面で確認できる";"That's a reekfish ()!
+コレクト＆装備画面で確認できる";"That's a reekfish ([FishLength])!
 This sacred fish is only found
 near the Zora village. It...reeks.
 
 You can see fish you've caught
 by pressing START and viewing
 the Collection screen.";"Vous avez pêché une truite
-fétide de ! Ce poisson
+fétide de [FishLength]! Ce poisson
 très rare ne se trouve qu'aux
 alentours du village des Zoras.
 Il a une odeur assez... intense.
@@ -7178,42 +7178,42 @@ Er hat einen sehr intensiven
 Geruch. Rufe mithilfe von START
 den Ausrüstungsbildschirm auf,
 um deine Fische zu betrachten.";
-"ニオイマス（）を
+"ニオイマス（[FishLength]）を
 釣り上げた！
 ゾーラの里でしか見られない珍しい魚
-かなり強烈に　においます・・・";"That's a reekfish ()!
+かなり強烈に　においます・・・";"That's a reekfish ([FishLength])!
 This rare fish is only found near
 the Zora village.
 
 It...reeks.";"Vous avez pêché une truite
-fétide de ! Ce poisson
+fétide de [FishLength]! Ce poisson
 très rare ne se trouve qu'aux
 alentours du village des Zoras.
-Il a une odeur assez... intense.";"Eine Dunstforelle ()!
+Il a une odeur assez... intense.";"Eine Dunstforelle ([FishLength])!
 Ein sehr seltener Fisch, den du
 nur an der Höhle der Zoras
 findest.
 Er hat einen... sehr intensiven
 Geruch!";
-"ニオイマス（）を
+"ニオイマス（[FishLength]）を
 釣り上げた！
 ゾーラの里でしか見られない珍しい魚
 かなり強烈に　においます・・・
 サイズは新記録！
-ウキ釣り日誌の記録が更新された";"That's a reekfish ()!
+ウキ釣り日誌の記録が更新された";"That's a reekfish ([FishLength])!
 This rare fish is only found near
 the Zora village.
 
 It...reeks. But you've set a new
 size record! Your fish journal
 has been updated.";"Vous avez pêché une truite
-fétide de ! Ce poisson
+fétide de [FishLength]! Ce poisson
 très rare ne se trouve qu'aux
 alentours du village des Zoras.
 Il a une odeur assez... intense.
 Vous avez établi un nouveau
 record! Votre carnet de pêche
-au coup a été mis à jour.";"Eine Dunstforelle ()!
+au coup a été mis à jour.";"Eine Dunstforelle ([FishLength])!
 Ein sehr seltener Fisch, den du
 nur an der Höhle der Zoras
 findest.
@@ -7221,19 +7221,19 @@ Er hat einen... sehr intensiven
 Geruch! Und groß ist er! Der
 Rekord in deinem Fangbuch
 wurde aktualisiert.";
-"グリーンギル（）を
+"グリーンギル（[FishLength]）を
 釣り上げた！
 どこでも見かける雑魚の一種
 釣り上げた魚は[WiiPlus]を押して
 コレクト＆装備画面で確認できる
-たくさん釣れるので　[A] で逃がしてやろう";"You caught a greengill ()!
+たくさん釣れるので　[A] で逃がしてやろう";"You caught a greengill ([FishLength])!
 These small fries are everywhere.
 
 
 Press [WiiPlus] to check the fish
 you've caught on the Collection
 screen. Let this one go with [WiiA].";"Vous avez attrapé un
-goujon de !
+goujon de [FishLength]!
 Ce poisson est très courant.
 
 Appuyez sur [WiiPlus] pour admirer
@@ -7242,7 +7242,7 @@ poissons que vous avez pêchés.
 
 Vous pouvez en pêcher à foison, ce
 n'est pas la peine de le garder.
-Appuyez sur [WiiA] pour le relâcher.";"Eine Grünkieme ()!
+Appuyez sur [WiiA] pour le relâcher.";"Eine Grünkieme ([FishLength])!
 Ein beliebter Fisch, den man
 überall finden kann.
 
@@ -7250,27 +7250,27 @@ Drücke [WiiPlus], um deinen Fang
 auf dem Ausrüstungsbildschirm
 zu begutachten. Mit [WiiA] lässt
 du einen Fisch frei.";
-"グリーンギル（）を釣り上げた！
+"グリーンギル（[FishLength]）を釣り上げた！
 どこでも見かける雑魚の一種
-たくさん釣れるので　[WiiA]で逃がしてやろう";"You caught a greengill ()!
+たくさん釣れるので　[WiiA]で逃がしてやろう";"You caught a greengill ([FishLength])!
 These small fries are everywhere.
 You can catch these all the time,
 so press [WiiA] to release it.";"Vous avez attrapé un goujon
-de !
+de [FishLength]!
 Du fretin que l'on trouve partout.
 
 Vous pouvez en pêcher à foison, ce
 n'est pas la peine de le garder.
-Appuyez sur [WiiA] pour le relâcher.";"Eine Grünkieme ()!
+Appuyez sur [WiiA] pour le relâcher.";"Eine Grünkieme ([FishLength])!
 Ein beliebter Fisch, den man
 überall finden kann. Drücke [WiiA], um
 ihn freizulassen.";
-"グリーンギル（）を
+"グリーンギル（[FishLength]）を
 釣り上げた！
 どこでも見かける雑魚の一種
 サイズは新記録！
 ウキ釣り日誌の記録が更新された
-たくさん釣れるので　[WiiA]で逃がしてやろう";"You caught a greengill ()!
+たくさん釣れるので　[WiiA]で逃がしてやろう";"You caught a greengill ([FishLength])!
 These small fries are everywhere.
 
 
@@ -7278,7 +7278,7 @@ This one sets a new size record!
 The record in the fish journal
 has been updated. Let the little
 guy go with [WiiA].";"Vous avez attrapé un goujon
-de !
+de [FishLength]!
 Du fretin que l'on trouve partout.
 
 Vous avez établi un nouveau
@@ -7287,7 +7287,7 @@ au coup a été mis à jour.
 
 Vous pouvez en pêcher à foison, ce
 n'est pas la peine de le garder.
-Appuyez sur [WiiA] pour le relâcher.";"Eine Grünkieme ()!
+Appuyez sur [WiiA] pour le relâcher.";"Eine Grünkieme ([FishLength])!
 Ein beliebter Fisch, den man
 überall finden kann. 
 
@@ -7295,12 +7295,12 @@ Der bisher größte seiner Art.
 Der Rekord in deinem Fangbuch
 wurde aktualisiert. Drücke [WiiA],
 um ihn freizulassen.";
-"ハイラルバス（）
+"ハイラルバス（[FishLength]）
 を釣り上げた！
 釣り好きの間では定番の魚
 釣り上げた魚は[WiiPlus]を押して
 コレクト＆装備画面で確認できる
-いつでも釣れるので　[WiiA]で逃がしてやろう";"That's a Hyrule bass ()!
+いつでも釣れるので　[WiiA]で逃がしてやろう";"That's a Hyrule bass ([FishLength])!
 For fishing enthusiasts, this fish
 is one of the basics. 
 
@@ -7308,7 +7308,7 @@ Press [WiiPlus] to check the fish
 you've caught on the Collection
 screen. Let this little guy go
 with [WiiA].";"Vous avez attrapé une
-perche d'Hyrule de !
+perche d'Hyrule de [FishLength]!
 Le poisson de base
 de l'amateur de pêche.
 Appuyez sur [WiiPlus] pour admirer
@@ -7318,7 +7318,7 @@ poissons que vous avez pêchés.
 Vous pouvez en pêcher quand vous
 voulez, ce n'est pas la peine de
 le garder. Appuyez sur [WiiA] pour
-le relâcher.";"Ein Hyrulebarsch ()!
+le relâcher.";"Ein Hyrulebarsch ([FishLength])!
 Standardfang für Petrijünger!
 
 
@@ -7326,32 +7326,32 @@ Drücke [WiiPlus], um deinen Fang
 auf dem Ausrüstungsbildschirm
 zu begutachten. Drücke [WiiA], um den
 Fisch freizulassen.";
-"ハイラルバス（）
+"ハイラルバス（[FishLength]）
 を釣り上げた！
 
 釣り好きの間では定番の魚
-いつでも釣れるので　[WiiA]で逃がしてやろう";"That's a Hyrule bass ()!
+いつでも釣れるので　[WiiA]で逃がしてやろう";"That's a Hyrule bass ([FishLength])!
 
 
 
 For fishing enthusiasts, this fish
 is one of the basics. Let this little
 guy go with [WiiA].";"Vous avez attrapé une
-perche d'Hyrule de !
+perche d'Hyrule de [FishLength]!
 Le poisson de base
 de l'amateur de pêche.
 Vous pouvez en pêcher quand vous
 voulez, ce n'est pas la peine de
 le garder. Appuyez sur [WiiA] pour
-le relâcher.";"Ein Hyrulebarsch ()!
+le relâcher.";"Ein Hyrulebarsch ([FishLength])!
 Standardfang für Petrijünger!
 Drücke [WiiA], um ihn freizulassen.";
-"ハイラルバス（）
+"ハイラルバス（[FishLength]）
 を釣り上げた！
 釣り好きの間では定番の魚
 サイズは新記録！
 ウキ釣り日誌の記録が更新された
-いつでも釣れるので　[WiiA]で逃がしてやろう";"That's a Hyrule bass ()!
+いつでも釣れるので　[WiiA]で逃がしてやろう";"That's a Hyrule bass ([FishLength])!
 For fishing enthusiasts, this fish
 is one of the basics. 
  
@@ -7359,7 +7359,7 @@ This one sets a new size record!
 The record in the fish journal
 has been updated. Let this guy
 go with [WiiA].";"Vous avez attrapé une
-perche d'Hyrule de !
+perche d'Hyrule de [FishLength]!
 Le poisson de base
 de l'amateur de pêche.
 Vous avez établi un nouveau
@@ -7369,7 +7369,7 @@ au coup a été mis à jour.
 Vous pouvez en pêcher quand vous
 voulez, ce n'est pas la peine de
 le garder. Appuyez sur [WiiA] pour
-le relâcher.";"Ein Hyrulebarsch ()!
+le relâcher.";"Ein Hyrulebarsch ([FishLength])!
 Standardfang für Petrijünger!
 
 
@@ -7377,53 +7377,53 @@ Der bisher größte seiner Art!
 Der Rekord in deinem Fangbuch
 wurde aktualisiert. Drücke [WiiA], um
 ihn freizulassen.";
-"ハイリアパイク（）
+"ハイリアパイク（[FishLength]）
 を釣り上げた！
 最近、人気があるらしい
 釣り上げた魚は[WiiPlus]を押して
 コレクト＆装備画面で確認できる
-[WiiA]で逃がしてやろう";"That's a Hylian pike ()!
+[WiiA]で逃がしてやろう";"That's a Hylian pike ([FishLength])!
 These have been gaining in
 popularity lately.
 
 Press [WiiPlus] to check the fish
 you've caught on the Collection
 screen. Release it with [WiiA].";"Vous avez attrapé un
-brochet d'Hylia de !
+brochet d'Hylia de [FishLength]!
 Un poisson très à
 la mode en ce moment.
 Appuyez sur [WiiPlus] pour admirer
 sur l'écran de quête tous les
 poissons que vous avez pêchés.
-Appuyez sur [WiiA] pour le relâcher.";"Ein Hyliahecht ()!
+Appuyez sur [WiiA] pour le relâcher.";"Ein Hyliahecht ([FishLength])!
 Zurzeit soll dieser Fisch
 ja sehr beliebt sein!
 
 Drücke [WiiPlus], um deinen Fang
 auf dem Ausrüstungsbildschirm
 zu begutachten.";
-"ハイリアパイク（）
+"ハイリアパイク（[FishLength]）
 を釣り上げた！
 
 最近、人気があるらしい
-[WiiA]で逃がしてやろう";"That's a Hylian pike ()!
+[WiiA]で逃がしてやろう";"That's a Hylian pike ([FishLength])!
 These have been gaining in
 popularity lately. Release it with [WiiA].";"Vous avez attrapé un
-brochet d'Hylia de !
+brochet d'Hylia de [FishLength]!
 
 
 Un poisson très à
 la mode en ce moment.
-Appuyez sur [WiiA] pour le relâcher.";"Ein Hyliahecht ()!
+Appuyez sur [WiiA] pour le relâcher.";"Ein Hyliahecht ([FishLength])!
 Zurzeit soll dieser Fisch ja sehr
 beliebt sein! Drücke [WiiA], um ihn
 freizulassen.";
-"ハイリアパイク（）
+"ハイリアパイク（[FishLength]）
 を釣り上げた！
 最近、人気があるらしい
 サイズは新記録！
 ウキ釣り日誌の記録が更新された
-[WiiA]で逃がしてやろう";"That's a Hylian pike ()!
+[WiiA]で逃がしてやろう";"That's a Hylian pike ([FishLength])!
 These have been gaining in
 popularity lately.
 
@@ -7431,13 +7431,13 @@ This one sets a new size record!
 The record in the fish journal
 has been updated. Release it with
 [WiiA].";"Vous avez attrapé un
-brochet d'Hylia de !
+brochet d'Hylia de [FishLength]!
 Un poisson très à
 la mode en ce moment.
 Vous avez établi un nouveau
 record! Votre carnet de pêche
 au coup a été mis à jour.
-Appuyez sur [WiiA] pour le relâcher.";"Ein Hyliahecht ()!
+Appuyez sur [WiiA] pour le relâcher.";"Ein Hyliahecht ([FishLength])!
 Zurzeit soll dieser Fisch
 ja sehr beliebt sein!
 
@@ -7445,12 +7445,12 @@ Der bisher größte seiner Art!
 Der Rekord in deinem Fangbuch
 wurde aktualisiert. Drücke [WiiA],
 um ihn freizulassen.";
-"ハイラルドジョウ（）
+"ハイラルドジョウ（[FishLength]）
 を釣り上げた！
 伝説と言われる魚の幼魚だ・・・
 釣り上げた魚は[WiiPlus]を押して
 コレクト＆装備画面で確認できる
-[WiiA]で逃がして　成魚に育ってから釣ろう";"That's a Hylian loach ()!
+[WiiA]で逃がして　成魚に育ってから釣ろう";"That's a Hylian loach ([FishLength])!
 It's the fry of a legendary fish...
 
 
@@ -7458,7 +7458,7 @@ Press [WiiPlus] to check the fish
 you've caught on the Collection
 screen. Release this one with [WiiA]
 and catch it when it's grown!";"Vous avez attrapé une
-loche d'Hyrule de !
+loche d'Hyrule de [FishLength]!
 C'est un jeune de ce
 poisson légendaire...
 Appuyez sur [WiiPlus] pour admirer
@@ -7467,39 +7467,39 @@ poissons que vous avez pêchés.
 
 Appuyez sur [WiiA] pour le relâcher,
 vous l'attraperez quand il aura
-grandi...";"Eine Hyrulegrundel ()!
+grandi...";"Eine Hyrulegrundel ([FishLength])!
 Bei Anglern gilt dieser Fisch
 schon fast als legendär...
 
 Drücke [WiiPlus], um deinen Fang
 auf dem Ausrüstungsbildschirm
 zu begutachten.";
-"ハイラルドジョウ（）
+"ハイラルドジョウ（[FishLength]）
 を釣り上げた！
 
 伝説と言われる魚の幼魚だ・・・
-[WiiA]で逃がして　成魚に育ってから釣ろう";"That's a Hylian loach ()!
+[WiiA]で逃がして　成魚に育ってから釣ろう";"That's a Hylian loach ([FishLength])!
 It's the fry of a legendary fish...
 
 
 Release this one with [WiiA] and
 catch it when it's grown!";"Vous avez attrapé une
-loche d'Hyrule de !
+loche d'Hyrule de [FishLength]!
 
 
 C'est un jeune de ce
 poisson légendaire... Appuyez
 sur [WiiA] pour le relâcher, vous
-l'attraperez quand il aura grandi...";"Eine Hyrulegrundel ()!
+l'attraperez quand il aura grandi...";"Eine Hyrulegrundel ([FishLength])!
 Bei Anglern gilt dieser Fisch
 schon fast als legendär... Drücke
 [WiiA], um ihn freizulassen.";
-"ハイラルドジョウ（）
+"ハイラルドジョウ（[FishLength]）
 を釣り上げた！
 伝説と言われる魚の幼魚だ・・・
 サイズは新記録！
 ウキ釣り日誌の記録が更新された
-[WiiA]で逃がして　成魚に育ってから釣ろう";"That's a Hylian loach ()!
+[WiiA]で逃がして　成魚に育ってから釣ろう";"That's a Hylian loach ([FishLength])!
 It's the fry of a legendary fish...
 
 
@@ -7507,7 +7507,7 @@ This one sets a new size record!
 The record in the fish journal
 has been updated. Release it with
 [WiiA] and catch it when it's grown!";"Vous avez attrapé une
-loche d'Hyrule de !
+loche d'Hyrule de [FishLength]!
 C'est un jeune de ce
 poisson légendaire...
 Vous avez établi un nouveau
@@ -7516,7 +7516,7 @@ au coup a été mis à jour.
 
 Appuyez sur [WiiA] pour le relâcher,
 vous l'attraperez quand il aura
-grandi...";"Eine Hyrulegrundel ()!
+grandi...";"Eine Hyrulegrundel ([FishLength])!
 Bei Anglern gilt dieser Fisch
 schon fast als legendär...
 
@@ -7524,25 +7524,25 @@ Der bisher größte seiner Art!
 Der Rekord in deinem Fangbuch
 wurde aktualisiert. Drücke [WiiA],
 um ihn freizulassen.";
-"トアルナマズ（）を
+"トアルナマズ（[FishLength]）を
 釣り上げた！
 [Link]と同じ　トアル出身！
 釣り上げた魚は[WiiPlus]を押して
 コレクト＆装備画面で確認できる
-[WiiA]で逃がしてやろう";"That's an Ordon catfish ()!
+[WiiA]で逃がしてやろう";"That's an Ordon catfish ([FishLength])!
 From Ordon like [Link]!
 
 
 Press [WiiPlus] to check the fish
 you've caught on the Collection
 screen. Release this one with [WiiA].";"Vous avez attrapé un
-silure de Toal de !
+silure de Toal de [FishLength]!
 Il vient de la même région
 que vous, [Link]!
 Appuyez sur [WiiPlus] pour admirer
 sur l'écran de quête tous les
 poissons que vous avez pêchés.
-Appuyez sur [WiiA] pour le relâcher.";"Ein Ordonwels ()!
+Appuyez sur [WiiA] pour le relâcher.";"Ein Ordonwels ([FishLength])!
 Heimisch in Ordon... Genau
 wie du!
 
@@ -7550,27 +7550,27 @@ Drücke [WiiPlus], um deinen Fang
 auf dem Ausrüstungsbildschirm
 zu begutachten. Lass ihn frei durch
 Drücken von [WiiA].";
-"トアルナマズ（）を
+"トアルナマズ（[FishLength]）を
 釣り上げた！
 
 [Link]と同じ　トアル出身！
-[WiiA]で逃がしてやろう";"That's an Ordon catfish ()!
+[WiiA]で逃がしてやろう";"That's an Ordon catfish ([FishLength])!
 From Ordon like [Link]!
 
 
 Release this one with [WiiA].";"Vous avez attrapé un
-silure de Toal de !
+silure de Toal de [FishLength]!
 Il vient de la même région
 que vous, [Link]!
-Appuyez sur [WiiA] pour le relâcher.";"Ein Ordonwels ()!
+Appuyez sur [WiiA] pour le relâcher.";"Ein Ordonwels ([FishLength])!
 Heimisch in Ordon... Genau wie du!
 Drücke [WiiA], um ihn freizulassen.";
-"トアルナマズ（）を
+"トアルナマズ（[FishLength]）を
 釣り上げた！
 [Link]と同じ　トアル出身！
 サイズは新記録！
 ウキ釣り日誌の記録が更新された
-[WiiA]で逃がしてやろう";"That's an Ordon catfish ()!
+[WiiA]で逃がしてやろう";"That's an Ordon catfish ([FishLength])!
 From Ordon like [Link]!
 
 
@@ -7578,13 +7578,13 @@ This one sets a new size record!
 The record in the fish journal
 has been updated. Release this one
 with [WiiA].";"Vous avez attrapé un
-silure de Toal de !
+silure de Toal de [FishLength]!
 Il vient de la même région
 que vous, [Link]!
 Vous avez établi un nouveau
 record! Votre carnet de pêche
 au coup a été mis à jour.
-Appuyez sur [WiiA] pour le relâcher.";"Ein Ordonwels ()!
+Appuyez sur [WiiA] pour le relâcher.";"Ein Ordonwels ([FishLength])!
 Heimisch in Ordon... Genau
 wie du!
 
@@ -7796,19 +7796,19 @@ Da es verboten ist, ihn zu
 fangen, erhält er keinen Eintrag
 im Fangbuch. Drücke [WiiA], um
 ihn freizulassen.";
-"ニオイマス（）を
+"ニオイマス（[FishLength]）を
 釣り上げた！
 ゾーラの里でしか見られない珍しい魚
 かなり強烈に　においます・・・
 釣り上げた魚は[WiiPlus]を押して
-コレクト＆装備画面で確認できる";"That's a reekfish ()!
+コレクト＆装備画面で確認できる";"That's a reekfish ([FishLength])!
 This sacred fish is only found
 near the Zora village. It...reeks.
 
 You can see fish you've caught
 by pressing [WiiPlus] and viewing
 the Collection screen.";"Vous avez pêché une truite
-fétide de ! Ce poisson
+fétide de [FishLength]! Ce poisson
 très rare ne se trouve qu'aux
 alentours du village des Zoras.
 Il a une odeur assez... intense.
@@ -20448,21 +20448,21 @@ hast...";
 もう一度　やり直すか！";"OK, then. Let's try 'er again!";"Bon, d'accord, recommence!";"Also gut... Dann noch einmal
 von vorne!";
 "おいおい、[Link]どうした？
-いつもよりも遅いじゃないか";"Hey, [Link], what's wrong?
-Y'all were  slower than
+いつもより[Time]も遅いじゃないか";"Hey, [Link], what's wrong?
+Y'all were [Time] slower than
 usual.";"Eh ben, [Link]?
- en plus? Qu'est-ce qui
+[Time] en plus? Qu'est-ce qui
 s'est passé? T'étais plus lent
 que d'habitude!";"Was ist denn los, [Link]?
 Sonst bist du doch immer
- schneller!";
+[Time] schneller!";
 "やっぱ　お前は手際がいいな〜！
-いつもよりも、早く済んだぜ";"Hoo, boy, but y'all can herd!
-That was  faster than
+いつもより[Time]も、早く済んだぜ";"Hoo, boy, but y'all can herd!
+That was [Time] faster than
 usual!";"T'es vraiment doué! T'as même
 été plus vite que d'habitude!
- en moins!";"Da merkt man, dass du ein echter
-Profi bist! Du bist 
+[Time] en moins!";"Da merkt man, dass du ein echter
+Profi bist! Du bist [Time]
 schneller als sonst!";
 "まあ、でも今日はこれで終わりだから
 お前は　はやく村長のトコに行きな？";"Well, that about wraps 'er up for
@@ -24491,10 +24491,10 @@ herd them goats into the barn.";"D'accord... Bon, ben dépêche-toi
 de rentrer le reste des chèvres!";"Na gut, dann treib das Vieh
 rasch in den Stall.";
 "どうした　[Link]？
-もかかるなんて、らしくない";"What's the story, [Link]?
-It ain't like you to take .";"Eh ben alors, [Link]?
-Il t'a fallu !";"Was ist denn los, [Link]?
-? Sonst bist du aber
+[Time]もかかるなんて、らしくない";"What's the story, [Link]?
+It ain't like you to take [Time].";"Eh ben alors, [Link]?
+Il t'a fallu [Time]!";"Was ist denn los, [Link]?
+[Time]? Sonst bist du aber
 schneller...";
 "でも　お陰で仕事が片付いて良かった！
 ありがとな";"But still, thanks to you, I did wrap
@@ -24502,11 +24502,11 @@ things up early. Much obliged!";"Bah, c'est rien, ça m'a quand
 même bien arrangé! Merci.";"Aber Hauptsache, die Arbeit ist
 erledigt. Danke.";
 "流石だな〜、[Link]！
-たったで　済んじまった！";"Hoo, way to ride, [Link]!
+たった[Time]で　済んじまった！";"Hoo, way to ride, [Link]!
 You wrapped that up in just
-!";"Impeccable, [Link]!
-T'as mis que !";"Wunderbar, [Link]!
-Gerade mal ! Tolle Zeit!";
+[Time]!";"Impeccable, [Link]!
+T'as mis que [Time]!";"Wunderbar, [Link]!
+Gerade mal [Time]! Tolle Zeit!";
 "お前が手伝ってくれたお陰で
 いつもよりうんと早く仕事が終わったよ";"Thanks to you, I wrapped things up
 a mite earlier today!";"Grâce à toi, j'ai fini beaucoup plus
@@ -30504,13 +30504,13 @@ Laden in Hyrule-Stadt! Ist doch
 für die armen Leute dort!";
 "いらしゃいまひぇ〜！";"Welllllllcome!";"Bienvenue!";"Willkommen!";
 "城下町進出　目標金額まで
-足りましぇん！";"We are  short of our
+[MartGoalLef]足りましぇん！";"We are [MartGoalLef] short of our
 financial objective... That is, the
 opening of a shop in Castle Town!";"Pour atteindre la somme nécessaire
 à l'ouverture de notre filiale 
 dans la citadelle, il nous manque 
-!";"Wir brauchen nur noch
-, dann können wir den
+[MartGoalLef]!";"Wir brauchen nur noch
+[MartGoalLef], dann können wir den
 Laden in Hyrule-Stadt eröffnen!";
 "高い物価に悩ましゃれる　城下町の人々に
 町の商品を安価で提供するための
@@ -30526,11 +30526,11 @@ Die Preise dort sind viel zu hoch!";
 "また今度、お願いしますぅ〜";"We look forward to your future
 contributions, Brudda!";"Peut-être une autre fois?";"Wir hoffen auf große Spenden von
 dir in der Zukunft.";
-"残り、になりました
-ご協力ありがとうごじゃいました！";"Only  left to go! Thank
-you for your cooperation, Brudda!";"Il manque désormais .
+"残り、[MartGoalLef]になりました
+ご協力ありがとうごじゃいました！";"Only [MartGoalLef] left to go! Thank
+you for your cooperation, Brudda!";"Il manque désormais [MartGoalLef].
 Merci pour votre générosité!";"Wir brauchen nur noch
-, dann ist es geschafft!
+[MartGoalLef], dann ist es geschafft!
 Vielen Dank für deine Hilfe.";
 "ご協力ありがとうごじゃいました！";"Thank you for your cooperation,
 Brudda!";"Merci pour votre générosité!";"Vielen Dank für deine Hilfe.";
@@ -30558,16 +30558,16 @@ les fonds nécessaires!!";"Fantastisch!!!
 Wir haben unser Ziel erreicht!";
 "城下町への流通ルートを確保するための
 橋の補修　費用
-足りましぇんっ・・・";"We are  short of
+[MartGoalLef]足りましぇんっ・・・";"We are [MartGoalLef] short of
 funding for the bridge repairs...
 We need that bridge for a steady
 flow of goods to Castle Town...";"Il nous faut réunir des fonds
 pour réparer le pont et sécuriser
 le transport de nos marchandises...
-Il nous manque .";"Für die Reparatur der Brücke zur
+Il nous manque [MartGoalLef].";"Für die Reparatur der Brücke zur
 Sicherung der Lieferungen nach
 Hyrule-Stadt brauchen wir nur
-noch .";
+noch [MartGoalLef].";
 "町の商品を安価で購入してもらうため、
 どうか資金援助にご協力くだひゃいっ！";"We MUST bring the cost of goods
 down in Castle Town, Brudda!
@@ -30625,14 +30625,14 @@ bei deinem Maromarkt!";
 
 ";
 "橋の補修費用　目標額まで
-残りになりました
-ご協力、ありがとうごじゃいましたっ！";"We have only  left to
+残り[MartGoalLef]になりました
+ご協力、ありがとうごじゃいましたっ！";"We have only [MartGoalLef] left to
 raise before we reach our goal
 for the bridge-repair fund! Thank
-you for your support, Brudda!";"Il manque désormais 
+you for your support, Brudda!";"Il manque désormais [MartGoalLef]
 pour couvrir les frais de réparation
 du pont!";"Für die Reparatur der Brücke
-brauchen wir noch .
+brauchen wir noch [MartGoalLef].
 Vielen Dank für deine Hilfe.";
 "オォ〜ナァ〜ッ！！
 城下町東とハイラル平原を繋ぐ橋の
@@ -30666,18 +30666,18 @@ zum Unterstützungsfonds, um die
 Waren in Hyrule-Stadt billiger
 verkaufen zu können.";
 "城下町進出　目標金額まで
-足りましぇん！";"We now have only  left
+[MartGoalLef]足りましぇん！";"We now have only [MartGoalLef] left
 before we reach our goal for
 financing a store in Castle Town,
-Brudda!";"Il nous manque 
+Brudda!";"Il nous manque [MartGoalLef]
 pour fonder notre filiale!";"Für die Eröffnung des Ladens in
 Hyrule-Stadt fehlen uns nur noch
-.";
-"残り、になりました
-ご協力ありがとうごじゃいました！";"We have only  left!
+[MartGoalLef].";
+"残り、[MartGoalLef]になりました
+ご協力ありがとうごじゃいました！";"We have only [MartGoalLef] left!
 Thank you for your cooperation,
-Brudda!";"Il manque désormais .
-Merci pour votre générosité!";"Es fehlen nur noch .
+Brudda!";"Il manque désormais [MartGoalLef].
+Merci pour votre générosité!";"Es fehlen nur noch [MartGoalLef].
 Vielen Dank für deine Hilfe.";
 "さぁ〜　ご一緒に〜！";"Together, we can do anything!";"Et maintenant, tous ensemble!";"Und jetzt alle zusammen!";
 "買っちゃいな〜　買っちゃいな〜
@@ -30707,13 +30707,13 @@ Weiterhin konnte ein Fonds für die
 Finanzierung der Expansion nach
 Hyrule-Stadt gegründet werden.";
 "しかし、城下町進出　目標金額まで
-まだあと足りましぇん！";"But in order to reach our Castle
+まだあと[MartGoalLef]足りましぇん！";"But in order to reach our Castle
 Town development goal, we still
-need !";"Malheureusement, il nous manque 
-encore  pour pouvoir 
+need [MartGoalLef]!";"Malheureusement, il nous manque 
+encore [MartGoalLef] pour pouvoir 
 ouvrir cette filiale!";"Aber an dem für die Expansion
 nach Hyrule-Stadt notwendigen Be-
-trag fehlen noch !";
+trag fehlen noch [MartGoalLef]!";
 "驚いた・・・
 [Link]じゃないか！";"Oh my... Color me surprised...
 If it isn't [Link]!";"Mais... ça alors!
@@ -36642,13 +36642,13 @@ enttäuschst mich, junger Freund!
 Aber gut: Die Star-Challenge steht
 dir jederzeit offen!";
 "オ・・・オゥケィ！！
-ボーイの記録　を
+ボーイの記録　[Time]を
 超えることができるかな？！";"Oh... Oh, what a stupendous day!
 You believe you can beat the
-record of ?!";"Fort bien, fort bien!
-Saurez-vous battre ,
+record of [Time]?!";"Fort bien, fort bien!
+Saurez-vous battre [Time],
 votre propre record?";"Also... Also gut!
-Dein Rekord liegt bei !
+Dein Rekord liegt bei [Time]!
 Die Frage ist, ob du ihn
 unterbieten kannst?";
 "じゃ、さっそく　いくぜ！
@@ -37444,28 +37444,28 @@ funden hast...
 bring es schnell hierher! Ich kann
 es kaum erwarten!";
 "アナタのおかげで、
-もの金色の虫さんが
-無事　来場されました！";"Thanks to you, I have  in
-attendance at the ball!";"Grâce à vous,  de mes sujets
+[ReturnedBugs]もの金色の虫さんが
+無事　来場されました！";"Thanks to you, I have [ReturnedBugs] in
+attendance at the ball!";"Grâce à vous, [ReturnedBugs] de mes sujets
 dorés ont déjà rejoint la salle!";"Dank deiner Hilfe beträgt die Zahl
 der goldenen Insekten im Schloss
-bereits !";
-"全員そろうまで、あと・・・
+bereits [ReturnedBugs]!";
+"全員そろうまで、あと[RemainingBugs]・・・
 できれば、ペアになっていない虫さんの
-パートナーも　探してくださいね";" left until I have them all...
+パートナーも　探してくださいね";"[RemainingBugs] left until I have them all...
 If you don't mind my asking, could
 you find a partner for any single
-bug at the ball?";"Il reste donc  pour
+bug at the ball?";"Il reste donc [RemainingBugs] pour
 commencer... Je vous en prie,
 continuez vos recherches pour
-qu'ils aient tous un partenaire!";"Nur noch ... Es muss von
+qu'ils aient tous un partenaire!";"Nur noch [RemainingBugs]... Es muss von
 jedem Insekt ein Paar sein. Bitte
 suche doch auch die Partner für
 die, die noch allein sind.";
-"現在の虫さんが
-アゲハのお城に　来場されています";"At the moment, I have  here at
+"現在[ReturnedBugs]の虫さんが
+アゲハのお城に　来場されています";"At the moment, I have [ReturnedBugs] here at
 Agitha's Castle, ready for the ball.";"Combien sont déjà arrivés au
-château... !";"! So viele Gäste
+château... [ReturnedBugs]!";"[ReturnedBugs]! So viele Gäste
 sind schon eingetroffen!";
 "２４匹の金色の虫さんに
 舞踏会の招待状を　お出ししたんですけど
@@ -37620,14 +37620,14 @@ kommen kann...";
 I'm so happy!";"Merci du fond du cœur!
 Je suis si heureuse!";"Danke! Danke!
 Ich bin sooo glücklich!";
-"全員そろうまで、あと・・・
+"全員そろうまで、あと[RemainingBugs]・・・
 引き続き、虫さんの来場に
-ご協力くださいね";" left until I have them all...
+ご協力くださいね";"[RemainingBugs] left until I have them all...
 Oh, I hope that you'll keep bringing
 them here! You will, right?";"Voyons... combien de mes sujets 
 manquent encore à l'appel... 
-? Je vous en prie, 
-continuez les recherches.";"Noch ...
+[RemainingBugs]? Je vous en prie, 
+continuez les recherches.";"Noch [RemainingBugs]...
 Mit deiner Hilfe werden sie sicher 
 alle bald den Weg hierher finden.";
 "それでは、アナタにも
@@ -37971,13 +37971,13 @@ wieder hierher kommen, okay?";
 voir, je suis encore paralysé.";"Na, Kläffer... Du siehst es ja.
 Ich kann mich immer noch nicht
 bewegen.";
-"だから早く　あと分の
+"だから早く　あと[PoesNeeded]分の
 ゴーストの魂、持って来てねぇ〜";"I NEED TO MOVE! Quick, you have
 to bring me the remaining ghost
-souls! I still need  more!";"Alors s'il te plaît, dépêche-toi
+souls! I still need [PoesNeeded] more!";"Alors s'il te plaît, dépêche-toi
 d'apporter ce qu'il me reste d'âme
-à retrouver! Il y a encore 
-à défaire!";"So ist es richtig! Nur noch ,
+à retrouver! Il y a encore [PoesNeeded]
+à défaire!";"So ist es richtig! Nur noch [PoesNeeded],
 dann hast du es geschafft!";
 "やったぁ〜〜！！
 動けるようになったよぉ！
@@ -38012,15 +38012,15 @@ pour que je retrouve mon âme...";"Seltsam... Vielleicht hättest du ja
 60 Geister fangen müssen, um
 meine Seele komplett zu machen?";
 "ワンちゃん、また頼んでい〜い？
-さらにのゴースト
+さらに[PoesNeeded]のゴースト
 退治してきてくれないかなぁ？";"Can I ask another favor of you,
 doggie? Can you defeat more
-ghosts? Just  more...";"Chienchien, puis-je encore compter
+ghosts? Just [PoesNeeded] more...";"Chienchien, puis-je encore compter
 sur ton aide? Il faudrait
-que tu détruises encore ,
+que tu détruises encore [PoesNeeded],
 tu veux bien?";"Ob ich dich wohl noch einmal los-
 schicken kann? Ob mein kleiner
-Kläffer wohl noch einmal 
+Kläffer wohl noch einmal [PoesNeeded]
 jagen kann?";
 "こんな姿じゃ、
 カノジョに会えないや・・・";"I can't see my girlfriend looking
@@ -38030,12 +38030,12 @@ dans cet état-là...";"So wie ich jetzt aussehe, kann ich
 meiner Freundin doch nicht unter
 die Augen treten...";
 "ワンちゃん、お願いだよぉ！
-あとのゴーストを
+あと[PoesNeeded]のゴーストを
 倒してくれよぉ〜！";"Doggie, please... Defeat just
- more!";"Chienchien, je t'en supplie!
-Détruis encore !";"Ich bitte dich, mein Freund...
+[PoesNeeded] more!";"Chienchien, je t'en supplie!
+Détruis encore [PoesNeeded]!";"Ich bitte dich, mein Freund...
 Du musst unbedingt noch
- erledigen!";
+[PoesNeeded] erledigen!";
 "うふふ〜！　これはねぇ〜、
 ゲルド砂漠の　ずぅ〜っと西にある洞窟で
 取れるらしいんだぁ〜";"Ah ha ha ha! I hear you can get this
@@ -38126,14 +38126,14 @@ que je récupère toute mon âme...";"Seltsam... Vielleicht muss man ja
 60 Geister erledigen, um meine
 Seele komplett zu befreien?!?";
 "・・・ワンちゃん、ホントにゴメン！
-さらにのゴースト
+さらに[PoesNeeded]のゴースト
 退治してきてくれないかなぁ？";"...I feel bad asking, doggie, but you
 think you could defeat more
-ghosts? Just  more...";"... Chienchien, je suis désolé!
+ghosts? Just [PoesNeeded] more...";"... Chienchien, je suis désolé!
 Tu veux bien aller encore détruire
-?";"Tut mir wirklich Leid, mein kleiner
+[PoesNeeded]?";"Tut mir wirklich Leid, mein kleiner
 Kläffer... aber kannst du nicht viel-
-leicht noch  erledigen?";
+leicht noch [PoesNeeded] erledigen?";
 "ゲンゴロウも動けるようになったし、
 これって、キミのおかげだろ？";"Gengle can move now, too, and
 something tells me you had quite a
@@ -49132,11 +49132,11 @@ retrouve-moi au sommet!";"Wenn du mal wieder Lust auf
 ein Rennen hast, komm zum
 Berggipfel.";
 "[Link]さんの
-雪すべりの最高記録はですわ";"Here best time of [Link]...
-!";"Votre record de vitesse en glissade,
+雪すべりの最高記録は[Time]ですわ";"Here best time of [Link]...
+[Time]!";"Votre record de vitesse en glissade,
 [Link], est de...
-!";"[Link], deine bisherige
-Bestzeit liegt bei !";
+[Time]!";"[Link], deine bisherige
+Bestzeit liegt bei [Time]!";
 "記録更新を目指すのも
 なかなか楽しいものですよ";"You try to break record, uh?
 It good time!";"Il est tout à fait distrayant de tenter
@@ -54466,57 +54466,57 @@ This is a Hyrule bass. They're
 pretty common around here.";"eu_07";"Herzlichen Glückwunsch! Du hast
 etwas gefangen! Das ist ein Hyrule-
 barsch. Den fängt man hier häufig.";
-"サイズは・・・くらいかな？
+"サイズは・・・[FishLength]くらいかな？
 [A] を押したら、コイツは逃がして
 また釣りの続きができるからね！";"Sizewise, I'd say it's about
-, maybe? Go ahead and
+[FishLength], maybe? Go ahead and
 press [A]  to release this one so you
 can keep fishing.";"Ce poisson fait dans les...
-? Tu peux le remettre
+[FishLength]? Tu peux le remettre
 à l'eau en appuyant sur [A]  et
 continuer à pêcher!";"Ich schätze, der ist ungefähr...
-! Wenn du [A]  drückst,
+[FishLength]! Wenn du [A]  drückst,
 kannst du ihn freilassen und weiter
 angeln.";
-"サイズは・・・くらいかな？
+"サイズは・・・[FishLength]くらいかな？
 [WiiA]を押したら、コイツは逃がして
 また釣りの続きができるからね！";"Sizewise, I'd say it's about
-, maybe? Go ahead and
+[FishLength], maybe? Go ahead and
 press [WiiA] to release this one so you
 can keep fishing.";"Ce poisson fait dans les...
-? Tu peux le remettre
+[FishLength]? Tu peux le remettre
 à l'eau en appuyant sur [WiiA] et
 continuer à pêcher!";"Ich schätze, der ist ungefähr...
-! Wenn du [WiiA] drückst,
+[FishLength]! Wenn du [WiiA] drückst,
 kannst du ihn freilassen und weiter
 angeln.";
 "あっ・・・！
 またハイラルバス！";"Ooh! It's another Hyrule bass!";"eu_07";"Oh...!
 Schon wieder ein Hyrulebarsch!";
-"ってとこかな？
+"[FishLength]ってとこかな？
 だいたい平均サイズね〜・・・
-じゃあ[A] で逃がして次いってみよう！";"I guess it's about .
+じゃあ[A] で逃がして次いってみよう！";"I guess it's about [FishLength].
 That's a pretty average size, if
 you're wondering. ...OK! Press [A] 
-to release it!";"eu_07";"Ich schätze, der ist etwa !
+to release it!";"eu_07";"Ich schätze, der ist etwa [FishLength]!
 Ziemlich durchschnittliche Größe...
 Lass ihn doch mit [A]  frei und
 versuch's noch einmal.";
-"ってとこかな？
+"[FishLength]ってとこかな？
 だいたい平均サイズね〜・・・
-じゃあ[WiiA]で逃がして次いってみよう！";"That looks to be about .
+じゃあ[WiiA]で逃がして次いってみよう！";"That looks to be about [FishLength].
 Yeah, that's pretty much average.
-...OK. Press [WiiA] to release it!";"eu_07";"Ich schätze, der ist etwa !
+...OK. Press [WiiA] to release it!";"eu_07";"Ich schätze, der ist etwa [FishLength]!
 Ziemlich durchschnittliche Größe...
 Lass ihn doch mit [WiiA] frei und
 versuch's noch einmal.";
 "でかっ！！";"That's HUGE!";"eu_07";"Ist der riesig!!!";
-"は　ありそうね・・・
+"[FishLength]は　ありそうね・・・
 でも、まだまだ大きいのもいるわよ！
-じゃあ[A] で逃がしてあげましょう";"That looks to be almost ...
+じゃあ[A] で逃がしてあげましょう";"That looks to be almost [FishLength]...
 But there are even bigger ones out
 there! ...OK! Press [A]  to release it.";"eu_07";"Der ist bestimmt mindestens
-...! Aber es gibt noch
+[FishLength]...! Aber es gibt noch
 größere. Lass ihn doch mit [A]  frei!";
 "お〜っ、釣れた！
 この魚はハイリアパイクって言うの、
@@ -54526,17 +54526,17 @@ by fishing fanatics these days!";"eu_07";"Oh, du hast einen gefangen!
 Das ist ein Hyliahecht. Der ist
 neuerdings ziemlich beliebt bei
 Angelfans.";
-"サイズはくらいね〜
-今はキープできないから[A] で逃がそう";"I'd say that's about .
+"サイズは[FishLength]くらいね〜
+今はキープできないから[A] で逃がそう";"I'd say that's about [FishLength].
 ...But you can't keep it today, so
 press [A]  to release it.";"eu_07";"Ich schätze, der ist ungefähr
-! Du kannst ihn jetzt nicht
+[FishLength]! Du kannst ihn jetzt nicht
 behalten. Lass ihn also mit [A]  frei.";
-"サイズはくらいね〜
-今はキープできないから[WiiA]で逃がそう";"It looks like it's almost .
+"サイズは[FishLength]くらいね〜
+今はキープできないから[WiiA]で逃がそう";"It looks like it's almost [FishLength].
 ...But you can't keep it today, so
 press [WiiA] to release it.";"eu_07";"Ich schätze, der ist ungefähr
-! Du kannst ihn jetzt nicht
+[FishLength]! Du kannst ihn jetzt nicht
 behalten. Lass ihn also mit [WiiA] frei.";
 "すっご〜い・・・
 またハイリアパイク！";"Amazing... Another Hylian pike!";"eu_07";"Super...!
@@ -54569,30 +54569,30 @@ Kein sonderlich beliebter Fisch...";
 ヌルヌルすぎてチョットね〜・・・";"They look cute and all, but they're
 a little too slimy...";"eu_07";"Die sehen zwar ganz süß aus,
 aber sie sind so schleimig...";
-"大きさはぐらいね、
+"大きさは[FishLength]ぐらいね、
 ・・・はやく[A] で逃がして違うの釣って！";"That one looks to be about
-... Hurry up and press [A] 
-to throw the thing back!";"eu_07";"Ich schätze, der ist etwa .
+[FishLength]... Hurry up and press [A] 
+to throw the thing back!";"eu_07";"Ich schätze, der ist etwa [FishLength].
 Lass ihn schnell mit [A]  frei und
 versuch, etwas anderes zu fangen.";
-"大きさはぐらいね、
+"大きさは[FishLength]ぐらいね、
 ・・・はやく[WiiA]で逃がして違うの釣って！";"That one looks to be about
-... Now hurry up and press
-[WiiA] to throw that thing back!";"eu_07";"Ich schätze, der ist etwa .
+[FishLength]... Now hurry up and press
+[WiiA] to throw that thing back!";"eu_07";"Ich schätze, der ist etwa [FishLength].
 Lass ihn schnell mit [WiiA] frei und
 versuch, etwas anderes zu fangen.";
 "げっ・・・
 ま、またナマズじゃん・・・";"Eww... Not another catfish...";"eu_07";"Pfui...
 Schon wieder ein Wels...";
-"えっと・・・くらい・・・？
-は、はやく[A] で逃がして次よ、次！";"Uh, I guess it's about ?
-OK! Press [A]  to release it! Quick!";"eu_07";"Also... , schätze ich!
+"えっと・・・[FishLength]くらい・・・？
+は、はやく[A] で逃がして次よ、次！";"Uh, I guess it's about [FishLength]?
+OK! Press [A]  to release it! Quick!";"eu_07";"Also... [FishLength], schätze ich!
 Lass ihn schnell mit [A]  wieder frei!";
-"えっと・・・くらい・・・？
-は、はやく[WiiA]で逃がして次よ、次！";"Uh, I guess it's about...?
-OK! Press [WiiA] and release it! Quick!";"Voyons voir... dans les ...?
+"えっと・・・[FishLength]くらい・・・？
+は、はやく[WiiA]で逃がして次よ、次！";"Uh, I guess it's about...[FishLength]?
+OK! Press [WiiA] and release it! Quick!";"Voyons voir... dans les [FishLength]...?
 Laisse-le partir en appuyant sur [WiiA],
-vite! Au suivant, au suivant!";"Also... , schätze ich!
+vite! Au suivant, au suivant!";"Also... [FishLength], schätze ich!
 Lass ihn schnell mit [WiiA] wieder frei!";
 "あ〜・・・惜しい！
 あわせに失敗しちゃったのね";"Ooh! Almost... You couldn't quite
@@ -54658,14 +54658,14 @@ dès que Saisir [WiiA][WiiB] s'affiche!";"Zieh den Fisch ganz dicht heran
 und wenn Landen [WiiA] + [WiiB] 
 erscheint, drücke die
 entsprechenden Knöpfe.";
-"は　ありそうね・・・
+"[FishLength]は　ありそうね・・・
 でも、まだまだ大きいのもいるわよ！
-じゃあ[A] で逃がしてあげましょう";"That looks to be about ...
+じゃあ[A] で逃がしてあげましょう";"That looks to be about [FishLength]...
 but there are bigger fish out there!
-OK! Press [WiiA] to release it.";"Une prise de ...
+OK! Press [WiiA] to release it.";"Une prise de [FishLength]...
 T'as raison, il doit y en avoir de
 plus grosses! Remets ce poisson à
-l'eau en appuyant sur [WiiA]!";"Der misst etwa ...
+l'eau en appuyant sur [WiiA]!";"Der misst etwa [FishLength]...
 Aber es gibt noch viel größere.
 Lass ihn doch mit [WiiA] frei.";
 "釣り方を切り替えますか？";"Do you want to try a different type
@@ -55334,11 +55334,11 @@ courant des viviers du coin, la
 perche d'Hyrule!";"Herzlichen Glückwunsch.
 Das ist ein typischer Fisch in
 diesem Teich, ein Hyrulebarsch!";
-"サイズは　ずばり、！
-さあ、どないする？";"Your fish looks to be !
+"サイズは　ずばり、[FishLength]！
+さあ、どないする？";"Your fish looks to be [FishLength]!
 What do you wanna do?";"Quant à sa taille, à vue de nez,
-je dirais... !
-Qu'est-ce que tu veux en faire?";"Er ist genau  groß!
+je dirais... [FishLength]!
+Qu'est-ce que tu veux en faire?";"Er ist genau [FishLength] groß!
 Was machst du?";
 "おぉ〜っ！　やるやん！
 この魚はハイリアパイクって言うねん！
@@ -55351,10 +55351,10 @@ l'arrachent!";"Oh! Super!
 Das ist ein Hyliahecht.
 In letzter Zeit heiß begehrt bei
 Fischfreunden!";
-"サイズは　やな〜
-さて、どないしよ？";"It looks to be about .
-What do you wanna do?";"Il mesure environ... !
-Qu'est-ce que tu veux en faire?";"Er ist  groß.
+"サイズは　[FishLength]やな〜
+さて、どないしよ？";"It looks to be about [FishLength].
+What do you wanna do?";"Il mesure environ... [FishLength]!
+Qu'est-ce que tu veux en faire?";"Er ist [FishLength] groß.
 Was machst du mit ihm?";
 "あちゃ〜・・・トアルナマズか・・・
 あんま人気ないんよな・・・";"Oh... An Ordon catfish, huh?
@@ -55366,10 +55366,10 @@ Nicht sonderlich beliebt...";
 but they're slimy, you know?";"Il a une bonne tête, mais il est tout
 visqueux... beuh...";"Hat zwar ein ganz süßes Gesicht,
 aber der ist so schleimig...";
-"サイズは　ってとこか・・・
-どないしたい・・・？";"Let's see, it's about ...
-What do you wanna do?";"Il fait à peu près... .
-Que veux-tu en faire?";"Ist etwa  groß...
+"サイズは　[FishLength]ってとこか・・・
+どないしたい・・・？";"Let's see, it's about [FishLength]...
+What do you wanna do?";"Il fait à peu près... [FishLength].
+Que veux-tu en faire?";"Ist etwa [FishLength] groß...
 Was meinst du...?";
 "うそやん！";"DEARIE ME!";"Incroyable!!!";"Unglaublich!";
 "でっ・・・伝説の・・・
@@ -55395,17 +55395,17 @@ I forgot to measure your fish.";"Ah!... J'ai été tellement
 encore évalué la taille de ta prise...";"Oh... Nein...
 Vor lauter Aufregung habe ich ganz
 vergessen, sie zu messen...";
-"えっと・・・ぐらいやわ・・・
-ど、どど、どうするっ？！";"Ooh... It's about .
-So um, wh-what do you wanna do?";"Voyons... Dans les ...
-Euh... que... que veux-tu en faire?!";"Also...  ungefähr...
+"えっと・・・[FishLength]ぐらいやわ・・・
+ど、どど、どうするっ？！";"Ooh... It's about [FishLength].
+So um, wh-what do you wanna do?";"Voyons... Dans les [FishLength]...
+Euh... que... que veux-tu en faire?!";"Also... [FishLength] ungefähr...
 W-W-Was machst du mit ihr?";
 "あっ、ハイラスバスや！
-大きさは　ってトコやな〜";"Oh, wow! That's a Hyrule bass!
+大きさは　[FishLength]ってトコやな〜";"Oh, wow! That's a Hyrule bass!
 Sizewise I'd say it's about
-, or so.";"Oh! C'est une perche d'Hyrule!
-Elle doit faire environ !";"Oh, ein Hyrulebarsch.
-Er ist etwa  groß.";
+[FishLength], or so.";"Oh! C'est une perche d'Hyrule!
+Elle doit faire environ [FishLength]!";"Oh, ein Hyrulebarsch.
+Er ist etwa [FishLength] groß.";
 "これやったら記録更新やから
 キープできるけど、どうする？";"This one's a record breaker, so
 you can keep it if you like. What do
@@ -55415,10 +55415,10 @@ Qu'est-ce que tu veux faire?";"Das ist ein neuer Rekord.
 Du könntest ihn behalten, willst
 du?";
 "おぉ、ハイリアパイクやん！
-ぐらいあるな〜";"Ooh, that's a Hylian pike! Looks
-like it's about .";"Oooh! Un brochet d'Hylia!
-Il mesure bien !";"Oh, ein Hyliahecht.
-Ist  groß.";
+[FishLength]ぐらいあるな〜";"Ooh, that's a Hylian pike! Looks
+like it's about [FishLength].";"Oooh! Un brochet d'Hylia!
+Il mesure bien [FishLength]!";"Oh, ein Hyliahecht.
+Ist [FishLength] groß.";
 "これやったら記録更新やから
 キープできるけど、どうする？";"This one's a record breaker, so
 you can keep it if you like. What do
@@ -55428,10 +55428,10 @@ Qu'est-ce que tu veux faire?";"Das ist ein neuer Rekord.
 Du könntest ihn behalten, willst
 du?";
 "あ〜っ！　トアルナマズかいな〜！
-はあるで〜";"Whoa! An Ordon catfish! And it's
-!";"Beuh... Un silure de Toal...
-Il fait .";"Oh, ein Ordonwels!
-Ist  groß!";
+[FishLength]はあるで〜";"Whoa! An Ordon catfish! And it's
+[FishLength]!";"Beuh... Un silure de Toal...
+Il fait [FishLength].";"Oh, ein Ordonwels!
+Ist [FishLength] groß!";
 "これやったら記録更新やから
 キープできるけど、どうする？";"This one's a record breaker, so
 you can keep it if you like. What do
@@ -55452,15 +55452,15 @@ landed it with my own eyes!
 Incredible!";"Et j'ai pu voir ça de mes propres
 yeux! Incroyable!";"Und ich habe genau gesehen, wie
 du sie gefangen hast! Unglaublich!";
-"サイズは・・・！！
+"サイズは・・・[FishLength]！！
 ちょ〜っ！　今までで一番デカいで！
 キープするやんな？　な？";"Sizewise it looks to be about...
-! Hey! That's bigger than
+[FishLength]! Hey! That's bigger than
 mine! You'll keep it, right?
-Won't you?!";"Elle mesure...!
+Won't you?!";"Elle mesure...[FishLength]!
 Ça alors! Elle est encore plus
 grosse que la précédente!
-Tu vas la garder, hein?";"Ist  groß!!!
+Tu vas la garder, hein?";"Ist [FishLength] groß!!!
 Wow! Noch größer als die andere!
 Willst du sie behalten?  
 Was meinst du?";
@@ -55469,42 +55469,42 @@ Was meinst du?";
 tu fais?";"Aber...
 Was machst du denn da...?";
 "あっ、ハイラスバスや！";"Oh! A Hyrule bass!";"Hé! C'est une perche d'Hyrule!";"Oh, ein Hyrulebarsch!";
-"大きさはってトコか〜・・・
-ちょっと小さいから、これはリリースやな〜";"I guess it's about ...
+"大きさは[FishLength]ってトコか〜・・・
+ちょっと小さいから、これはリリースやな〜";"I guess it's about [FishLength]...
 It's a little on the small side, so
-you ought to release it.";"... Un peu petite pour
-qu'on la garde... Remets-la à l'eau.";"Ist etwa  groß...
+you ought to release it.";"[FishLength]... Un peu petite pour
+qu'on la garde... Remets-la à l'eau.";"Ist etwa [FishLength] groß...
 Bisschen klein, oder? Lassen wir
 ihn frei.";
 "おぉ、ハイリアパイクやん！";"Oh! A Hylian pike!";"Oh! Un brochet d'Hylia!";"Oh, ein Hyliahecht!";
-"あ〜、でもぐらいか・・・
+"あ〜、でも[FishLength]ぐらいか・・・
 今キープしてるのより小さいから、
 これはリリースやね〜";"Aw, but it looks like it's only about
-... It's a little too small
+[FishLength]... It's a little too small
 to keep now, so you ought to
-release it.";"Mais il ne fait que ...
+release it.";"Mais il ne fait que [FishLength]...
 Il est plus petit que celui que tu
 gardes dans l'aquarium.
-Remets-le à l'eau!";"Aber leider nur  groß...
+Remets-le à l'eau!";"Aber leider nur [FishLength] groß...
 Kleiner als der, den du schon hast.
 Lass ihn frei.";
 "あ〜っ！
 トアルナマズかいな〜！";"Ah! Is that an Ordon catfish?";"Ah! Un silure de Toal!";"Oh!
 Ein Ordonwels.";
-"だいたいやな、小さいわ
-リリースしよ！　リリース！";"It's roughly , huh? That's
-too small. Release it! Release!";"... Trop petit!
-Remets-le à l'eau! Allez!";"Ist etwa ... Ziemlich klein.
+"だいたい[FishLength]やな、小さいわ
+リリースしよ！　リリース！";"It's roughly [FishLength], huh? That's
+too small. Release it! Release!";"[FishLength]... Trop petit!
+Remets-le à l'eau! Allez!";"Ist etwa [FishLength]... Ziemlich klein.
 Lass ihn frei. Na los!";
-"サイズは・・・・・・
+"サイズは・・・[FishLength]・・・
 ああ〜っ、残念！　前のんより小さい！
-勿体ないけど、これはリリースするわ・・・";"That size looks to be......
+勿体ないけど、これはリリースするわ・・・";"That size looks to be...[FishLength]...
 Oh, too bad! That's smaller than
 the last one! It's a waste, but you'll
-have to let the little guy go...";"Elle mesure... ... Elle est
+have to let the little guy go...";"Elle mesure... [FishLength]... Elle est
 plus petite que celle de l'autre
 fois! C'est bête, mais tu vas devoir
-la remettre à l'eau...";"Der ist...  groß...
+la remettre à l'eau...";"Der ist... [FishLength] groß...
 Ach, schade! Kleiner als der
 andere. Ist zwar ein Jammer,
 aber lass ihn frei.";
@@ -55522,50 +55522,50 @@ keep!";"Enfin, c'est toujours bon
 à prendre!";"Keine falsche Bescheidenheit.
 Du darfst es ruhig behalten!";
 "この魚をキープしますか？";"Are you going to keep this fish?";"Voulez-vous garder ce poisson?";"Möchtest du den Fisch behalten?";
-"ハイラルバス（）が　釣れた！
-記録更新が熱い、釣堀の定番";"That's a Hyrule bass ()!
+"ハイラルバス（[FishLength]）が　釣れた！
+記録更新が熱い、釣堀の定番";"That's a Hyrule bass ([FishLength])!
 Competition is fierce to catch a
 record size of this fishing-hole
 standard!";"Vous avez pêché une perche
-d'Hyrule de !
+d'Hyrule de [FishLength]!
 Les records sont difficiles à battre
 pour ce poisson très commun!";"Du hast einen Hyrulebarsch
-() gefangen.
+([FishLength]) gefangen.
 Fische von dieser Sorte findest
 du hier im Angelteich oft...";
-"ハイリアパイク（）が釣れた！
+"ハイリアパイク（[FishLength]）が釣れた！
 つぶらな瞳で釣りファンをイチコロに
-している、話題の魚";"That's a Hylian pike ()!
+している、話題の魚";"That's a Hylian pike ([FishLength])!
 It's the fish notorious for winning
 over fans with its closed eyes.";"Vous avez pêché un brochet
-d'Hylia de !
+d'Hylia de [FishLength]!
 Il est très apprécié des amateurs
 de pêche pour ses pupilles rondes!";"Du hast einen Hyliahecht
-() gefangen.
+([FishLength]) gefangen.
 Er ist bekannt für seine
 schönen runden Augen.";
-"トアルナマズ（）が　釣れた！
+"トアルナマズ（[FishLength]）が　釣れた！
 [Link]と同じ、トアル出身
-釣堀では人気がないらしい・・・";"That's an Ordon catfish ()!
+釣堀では人気がないらしい・・・";"That's an Ordon catfish ([FishLength])!
 From Ordon like [Link]!
 It's not too popular at the fishing
 hole...";"Vous avez pêché un silure de Toal
-de !
+de [FishLength]!
 Comme vous, il est originaire de
 Toal. Il n'est pas très populaire...";"Du hast einen Ordonwels
-() gefangen. Der stammt
+([FishLength]) gefangen. Der stammt
 aus Ordon, ebenso wie du. Ist
 aber nicht sonderlich beliebt.";
-"ハイラルドジョウ（）が釣れた！
+"ハイラルドジョウ（[FishLength]）が釣れた！
 釣りマニアの間で　伝説と言われる
-稀少な魚！　しかも、よりレアな成魚だ！";"That's a Hylian loach ( )!
+稀少な魚！　しかも、よりレアな成魚だ！";"That's a Hylian loach ([FishLength] )!
 This rare fish is a legend among
 true anglers, and catching an adult
 is ultrarare!";"Vous avez pêché une loche
-d'Hyrule de !
+d'Hyrule de [FishLength]!
 Si rare que les amateurs de pêche
 en parlent comme d'une légende!";"Du hast eine Hyrulegrundel
-() gefangen.
+([FishLength]) gefangen.
 Er ist extrem selten. Und ausge-
 wachsene Exemplare noch seltener!";
 "記録更新！
@@ -55573,62 +55573,62 @@ wachsene Exemplare noch seltener!";
 this fish?";"C'est un nouveau record!
 Voulez-vous garder ce poisson?";"Ein neuer Rekord!
 Möchtest du den Fisch behalten?";
-"ハイラルドジョウ（）が釣れた！
-伝説の魚を　またしても釣り上げた！";"That's a Hylian loach ()!
+"ハイラルドジョウ（[FishLength]）が釣れた！
+伝説の魚を　またしても釣り上げた！";"That's a Hylian loach ([FishLength])!
 You landed another of the
 legendary fish!";"Vous avez pêché une loche
-d'Hyrule de !
+d'Hyrule de [FishLength]!
 Vous avez encore attrapé ce
 poisson légendaire!";"Du hast eine Hyrulegrundel
-() gefangen.
+([FishLength]) gefangen.
 Ein weiteres Exemplar des
 legendären Fisches!";
-"ハイラルバス（）が　釣れた！
+"ハイラルバス（[FishLength]）が　釣れた！
 記録更新が熱い、釣堀の定番
-小さいので、これはリリース";"That's a Hyrule bass ()!
+小さいので、これはリリース";"That's a Hyrule bass ([FishLength])!
 There's a heated battle for a
 record-sized bass. It's not larger
 than your record, so release it.";"Vous avez pêché une perche
-d'Hyrule de !
+d'Hyrule de [FishLength]!
 Difficile de battre le record... Elle
 est trop petite, remettez-la à l'eau!";"Du hast einen Hyrulebarsch
-() gefangen.
+([FishLength]) gefangen.
 Typisch für diesen Teich.
 Aber ziemlich klein, lass ihn frei.";
-"ハイリアパイク（）が釣れた！
+"ハイリアパイク（[FishLength]）が釣れた！
 釣りファンの間で　人気沸騰中の魚
-小さいので、これはリリース";"That's a Hylian pike ()!
+小さいので、これはリリース";"That's a Hylian pike ([FishLength])!
 Anglers are really into this fish
 right now. It's not larger than your
 record, so release it.";"Vous avez pêché un brochet
-d'Hylia de !
+d'Hylia de [FishLength]!
 Très apprécié des amateurs, mais il
 est trop petit! Remettez-le à l'eau!";"Du hast einen Hyliahecht
-() gefangen.
+([FishLength]) gefangen.
 Sehr beliebt bei Angelfans.
 Ist aber zu klein. Lass ihn frei.";
-"トアルナマズ（）が　釣れた！
+"トアルナマズ（[FishLength]）が　釣れた！
 [Link]と同じ、トアル出身
-小さいので、これはリリース";"That's an Ordon catfish ()!
+小さいので、これはリリース";"That's an Ordon catfish ([FishLength])!
 From Ordon like [Link]!
 It's not larger than your record,
 so you should release it.";"Vous avez pêché un silure de Toal
-de !
+de [FishLength]!
 Il est originaire de Toal. Il est 
 trop petit, remettez-le à l'eau!";"Du hast einen Ordonwels
-() gefangen.
+([FishLength]) gefangen.
 Der stammt aus Ordon, wie du.
 Ist aber zu klein. Lass ihn frei.";
-"ハイラルドジョウ（）が釣れた！
+"ハイラルドジョウ（[FishLength]）が釣れた！
 伝説の魚を　またしても釣り上げた！
-だが小さいので、これはリリース";"That's a Hylian loach ()!
+だが小さいので、これはリリース";"That's a Hylian loach ([FishLength])!
 You caught another of the
 legendary fish! It's not larger than
 your record, so release it.";"Vous avez pêché une loche
-d'Hyrule de !
+d'Hyrule de [FishLength]!
 Le poisson légendaire! Mais elle
 est trop petite, remettez-la à l'eau!";"Du hast eine Hyrulegrundel
-() gefangen. Schon wieder
+([FishLength]) gefangen. Schon wieder
 so ein legendärer Fisch!
 Ist aber zu klein, lass sie frei.";
 "ハートのかけらが　釣れた！
@@ -56971,15 +56971,15 @@ You need money to play!";"Désolée! Si t'as pas d'argent,
 tu peux pas jouer!";"Du hast ja gar kein Geld!
 Dann darfst du auch nicht spielen.";
 "なんや・・・　残念やなぁ・・・";"Ooh... That's too bad...";"Oh...? Dommage...";"Ach... Schade...";
-"コロコロゲーム　
+"コロコロゲーム　[RollGoal]
 １回５ルピー、ゴールしたら１０ルピー！
-やっていく？";"Rollgoal Level 
+やっていく？";"Rollgoal Level [RollGoal]
 One play for 5 Rupees. You win
 10 Rupees if you make it to the
-goal! Wanna play?";"Korokoro niveau !
+goal! Wanna play?";"Korokoro niveau [RollGoal]!
 5 rubis la partie, et tu gagnes
 10 rubis si tu parviens à l'arrivée!
-Tu veux jouer?";"Murmelslalom Level .
+Tu veux jouer?";"Murmelslalom Level [RollGoal].
 Ein Versuch kostet 5 Rubine, aber
 wenn du die Kugel ins Ziel bringst,
 bekommst du 10 Rubine! Willst du?";
@@ -57254,15 +57254,15 @@ tu pourras essayer un nouveau
 parcours! Je le préparerai d'ici là.";"Bis zum nächsten Mal baue ich
 eine neue Strecke für dich.
 Bis bald also.";
-"コロコロゲーム　
+"コロコロゲーム　[RollGoal]
 １回５ルピー、ゴールしたら１０ルピー
-まだ前と同じコースやけど、またやる？";"Rollgoal Level 
+まだ前と同じコースやけど、またやる？";"Rollgoal Level [RollGoal]
 One play for 5 Rupees. Win 10
 Rupees if you make it to the goal!
-Same course, though. Wanna play?";"Korokoro niveau !
+Same course, though. Wanna play?";"Korokoro niveau [RollGoal]!
 5 rubis la partie, et tu gagnes
 10 rubis si tu parviens à l'arrivée!
-Tu veux refaire ce parcours?";"Murmelslalom Level .
+Tu veux refaire ce parcours?";"Murmelslalom Level [RollGoal].
 Kostet 5 Rubine. Schaffst du's ins
 Ziel, bekommst du 10 Rubine! Ist
 aber noch das gleiche. Willst du?";
@@ -57290,15 +57290,15 @@ donnerai moins de temps pour y
 arriver!";"Ich werde eine schwierigere
 Version mit strengeren
 Zeitvorgaben erfinden.";
-"コロコロゲーム　
+"コロコロゲーム　[RollGoal]
 １回５ルピー、ゴールしたら１０ルピー！
-難しいバージョン、やっていく？";"Rollgoal Game Level 
+難しいバージョン、やっていく？";"Rollgoal Game Level [RollGoal]
 One play for 5 Rupees. Win 10
 Rupees if you make it to the goal!
-Want to play the harder version?";"Korokoro niveau !
+Want to play the harder version?";"Korokoro niveau [RollGoal]!
 5 rubis la partie, et tu gagnes
 10 rubis si tu parviens à l'arrivée!
-Tu veux essayer ce nouveau défi?";"Murmelslalom . Ein Versuch kostet
+Tu veux essayer ce nouveau défi?";"Murmelslalom [RollGoal]. Ein Versuch kostet
 5 Rubine. Schaffst du es ins Ziel,
 bekommst du 10 Rubine. Probierst
 du die schwierige Version?";
@@ -57439,13 +57439,13 @@ frei auswählen. Was sagst du dazu?";
 🡄  [AnalogHorizontal]  🡆 ";"Niveau 8
 🡄  [AnalogHorizontal]  🡆 ";"Level 8
 🡄  [AnalogHorizontal]  🡆 ";
-"コロコロゲーム　
+"コロコロゲーム　[RollGoal]
 １回５ルピー、これが最後の面やで！！
-やっていく？";"Rollgoal Game 
+やっていく？";"Rollgoal Game [RollGoal]
 5 Rupees per game. This is the
-FINAL LEVEL! Wanna play?";"Korokoro niveau !
+FINAL LEVEL! Wanna play?";"Korokoro niveau [RollGoal]!
 5 rubis la partie! Attention, c'est
-le dernier niveau! Ça te dit?";"Murmelslalom Level 
+le dernier niveau! Ça te dit?";"Murmelslalom Level [RollGoal]
 Ein Spiel kostet 5 Rubine, und das
 hier ist das letzte Brett. Du willst
 doch sicher spielen, oder? ";
@@ -60231,11 +60231,11 @@ Bitte geh nicht hinein!";
 "まさか、あなた・・・";"...Did you really do it?";"... Incroyable!";"Du willst doch wohl nicht...?";
 "ご利用ありがとうございました！";"Thanks for your patronage!";"J'espère que tu t'es bien amusé!";"Gut gemacht!";
 "今回の川下りで
-壊した的の合計点はです！";"On this trip downriver, you scored
- destroying targets!";"Tu veux savoir combien de cibles
+壊した的の合計点は[RiverPoints]です！";"On this trip downriver, you scored
+[RiverPoints] destroying targets!";"Tu veux savoir combien de cibles
 tu as touchées cette fois?
-!";"Du hast auf deiner Abfahrt
-insgesamt  erzielt.";
+[RiverPoints]!";"Du hast auf deiner Abfahrt
+insgesamt [RiverPoints] erzielt.";
 "またのご利用、お待ちしてます！";"Come again anytime!";"Reviens quand tu veux!";"Bitte besuche uns bald wieder.";
 "私は、このハイリア湖を担当している
 ゾーラ族の者です";"I am a member of the Zora tribe,
@@ -61320,8 +61320,8 @@ hattest... Das Ergebnis ist dann
 null Punkte! Neustart mit [WiiB]!";
 "アッ、ソ！";"Ah, I see...";"Ah, j'ai oublié oublié!";"Oh!";
 "アンタノ最高得点ハ
-ネ";"Your high score is !";"Ton record est de !";"Deine Höchstpunktzahl
-beträgt .";
+[HighScore]ネ";"Your high score is [HighScore]!";"Ton record est de [HighScore]!";"Deine Höchstpunktzahl
+beträgt [HighScore].";
 "アトラクションッテノハ
 風船ヲ割リナガラ
 ゴールヲ目指ス　ゲームナノ";"This attraction is all about popping
@@ -61406,9 +61406,9 @@ reviens me voir me voir!
 haben willst, komm zu mir. Ich
 warte hier auf dich...!";
 "エッ、ウッソー！
-？！";"What?! No way! ?!";"HEIN!!
-?!";"Unglaublich?!?
-?!?";
+[LatestScore]？！";"What?! No way! [LatestScore]?!";"HEIN!!
+[LatestScore]?!";"Unglaublich?!?
+[LatestScore]?!?";
 "ア、１００００点超エタンダネ・・・
 ジャ　コレ、受ケ取ッテヨ";"You got more than 10,000 points...
 Wow. Here, take this.";"Ouuuh! Tu as dépassé les
@@ -61446,7 +61446,7 @@ aufgestellt.";
 So, let me give you this...";"Ouh... J'ai le cœur qui bat fort 
 fort! Tiens! C'est pour toi pour toi!";"Das war ganz schön aufregend...
 Hier, nimm das!";
-"フーン、カ・・・";"Hmmm! ...";"Hmm... ...";"Hm, ...";
+"フーン、[LatestScore]カ・・・";"Hmmm! [LatestScore]...";"Hmm... [LatestScore]...";"Hm, [LatestScore]...";
 "プププ・・・
 自己ベスト、更新デキナカッタネ！";"Booooooooooooooooooooooo...
 That's nowhere near my personal
@@ -61478,11 +61478,11 @@ Je veux des sensations fortes!";"Versuche also das nächste Mal,
 viele Punkte zu erreichen! Zeig
 mir dann etwas ganz Besonderes...";
 "ショ・・・ショボッ！";"How...weak!";"C'est... faible!";"Oh... Wie mies!";
-"ッテ　アンタ
-ヤル気アンノ？！";"... I mean, really...
-Are you even trying?!";"... Ça t'intéresse
+"[LatestScore]ッテ　アンタ
+ヤル気アンノ？！";"[LatestScore]... I mean, really...
+Are you even trying?!";"[LatestScore]... Ça t'intéresse
 vraiment ou tu fais semblant?
-Il faut plus plus!";"!
+Il faut plus plus!";"[LatestScore]!
 Wenn du keine Lust hast,
 lass es lieber gleich!";
 "デ、デモ　次ハ頑張ッテヨネ
@@ -61635,27 +61635,27 @@ funden hast, bring es schnell
 hierher! Und wag es nicht, auf
 dem Weg zu trödeln, ja?!?";
 "アナタのおかげで、
-もの金色の虫さんが
-無事　来場されました！";"Thanks to you, I have  ready
-for the ball at my castle!";"Grâce à vous, j'ai déjà reçu !";"Dank dir haben schon viele
+[ReturnedBugs]もの金色の虫さんが
+無事　来場されました！";"Thanks to you, I have [ReturnedBugs] ready
+for the ball at my castle!";"Grâce à vous, j'ai déjà reçu [ReturnedBugs]!";"Dank dir haben schon viele
 goldene Insekten den Weg
-gefunden! , um genau
+gefunden! [ReturnedBugs], um genau
 zu sein!";
-"全員そろうまで、あと・・・
+"全員そろうまで、あと[RemainingBugs]・・・
 できれば、ペアになってない虫さんの
-パートナーも探してくださいね";"We only need  more until all
+パートナーも探してくださいね";"We only need [RemainingBugs] more until all
 of them are here... Please do your
 best to find partners for the ones
-that are not already paired up!";"Cela veut dire qu'il manque 
+that are not already paired up!";"Cela veut dire qu'il manque [RemainingBugs]
 pour pouvoir ouvrir le bal... Je vous
 en prie, continuez vos efforts pour
-qu'ils aient tous un partenaire!";"Nur noch  also, bis alle 24
+qu'ils aient tous un partenaire!";"Nur noch [RemainingBugs] also, bis alle 24
 beisammen sind. Und versuch auch,
 Partner für diejenigen zu finden,
 die noch allein sind!";
-"現在の虫さんが
-アゲハのお城に　来場されています";"As of now, I have  at my
-castle.";"J'ai déjà accueilli  au château.";"Im Moment habe ich 
+"現在[ReturnedBugs]の虫さんが
+アゲハのお城に　来場されています";"As of now, I have [ReturnedBugs] at my
+castle.";"J'ai déjà accueilli [ReturnedBugs] au château.";"Im Moment habe ich [ReturnedBugs]
 hier im Schloss.";
 "２４匹の金色の虫さんに
 舞踏会の招待状を　お出ししたんですけど
@@ -61929,9 +61929,9 @@ erhalten hast, jederzeit lesen.";
 Monsieur [Link]!";"Hallo, [Link]!";
 "お手紙を　お届けに参りましたァ";"I have come to deliver a letter.";"J'ai du courrier pour vous!";"Ich habe Post für dich.";
 "[Link]さん宛てにィ
-　お手紙がありますゥ";"There is a letter for you,
-[Link]. , in fact!";"J'ai  pour vous,
-monsieur [Link]!";"Ich habe hier  für dich.";
+[LetterCount]　お手紙がありますゥ";"There is a letter for you,
+[Link]. [LetterCount], in fact!";"J'ai [LetterCount] pour vous,
+monsieur [Link]!";"Ich habe hier [LetterCount] für dich.";
 "[LetterSender]さんからの
 お手紙ですネ";"It is a letter from [LetterSender].";"C'est la lettre envoyée par
 [LetterSender].";"Hier steht auch der Absender:
@@ -62461,8 +62461,8 @@ Briefe.";
 "緑ルピーを手に入れた
 １ルピーだ！
 たくさん集めよう！";"";"";"";
-"牛の数は　です";"";"";"";
-"ただいまです";"";"";"";
+"牛の数は　[ReturnedBugs]です";"";"";"";
+"ただいまnoopです";"";"";"";
 "ブツブツブツブツ・・・";"";"";"";
 "棒きれなんて　振り回して
 なにが面白いんだろ・・・？";"";"";"";
