@@ -1,5 +1,6 @@
-use std::{f32::consts::E, fmt, fs::File, io::{BufRead, BufReader, Write}, path::Path};
+use std::{default, f32::consts::E, fmt, fs::File, io::{BufRead, BufReader, Write}, path::Path, thread::current};
 use regex::{Captures, Regex};
+use rust_xlsxwriter::{Color, Format, FormatAlign};
 use std::sync::LazyLock;
 use itertools::Itertools;
 
@@ -315,7 +316,7 @@ impl Message {
         let s = raw.replace(r"\n", "<br>");
 
         if ignore_tags {
-            RE_TAG.replace_all(&s, "").to_string()
+            RE_TAG.replace_all(&s, |c : &Captures| c[0].parse::<Tag>().unwrap_or_default().get_simple_replacement().to_owned()).to_string()
         } else {
             let tags_it = RE_TAG.find_iter(&self.text[lang_id]).flat_map(|m| m.as_str().parse::<Tag>()).map(|t| TextPart::Tag(t));
             let str_it = RE_TAG.split(&s).map(|s| TextPart::Text(s));
@@ -327,7 +328,7 @@ impl Message {
             let mut current_size = 100;
 
             let mut needs_ruby : Option<(u8, String)> = None;
-            // for (s, tag) in str_it.zip(tags_it) {
+
             for part in str_it.interleave(tags_it) {
                 match part {
                     TextPart::Text(text) => {
@@ -389,6 +390,72 @@ impl Message {
             res_str
         }
         
+    }
+
+    fn get_xlsx_formatted(&self, lang_id : usize, ignore_tags : bool, default_color : Color ) -> Vec<(Format, String)> {
+        let raw = &self.text[lang_id];
+        let s = raw.replace(r"\n", "\n");
+        let mut segments : Vec<(Format, String)> = Vec::new();
+
+        if ignore_tags {
+            segments.push((Format::new(), RE_TAG.replace_all(&s, |c : &Captures| c[0].parse::<Tag>().unwrap_or_default().get_simple_replacement().to_owned()).to_string()));
+        } else {
+            let tags_it = RE_TAG.find_iter(&self.text[lang_id]).flat_map(|m| m.as_str().parse::<Tag>()).map(|t| TextPart::Tag(t));
+            let str_it = RE_TAG.split(&s).map(|s| TextPart::Text(s));
+
+            let mut current_color = 0;
+            let mut current_size = 100;
+
+            const DEFAULT_SIZE : f32 = 11.0;
+
+
+            for part in str_it.interleave(tags_it) {
+                match part {
+                    TextPart::Text(text) => {
+                        if !text.is_empty() {
+                            let color = if current_color == 0 { default_color } else { Color::from(COLORS_RGB[current_color])};
+                            let size = DEFAULT_SIZE * (current_size as f32/100.0);
+                            let format = Format::new().set_font_color(color).set_font_size(size);
+                            segments.push((format, text.to_string()));
+                        }
+                    },
+                    TextPart::Tag(tag) => {
+                        match tag.group {
+                            0xFF => {
+                                match tag.number {
+                                    0x00 => { // change color
+                                        //color
+
+                                        current_color = tag.payload[0] as usize;
+                                    },
+                                    0x01 => {
+
+                                        current_size = get_u16_from_payload(&tag.payload, 0);
+                                        //Size
+                                    },
+                                    0x02 => {
+                                        //ruby
+                                    },
+                                    _ => {}
+                                }
+                            }
+                            _ => { 
+                                let s = tag.get_simple_replacement().to_string();
+                                if !s.is_empty() {
+                                    let color = if current_color == 0 { default_color } else { Color::from(COLORS_RGB[current_color])};
+                                    let size = DEFAULT_SIZE * (current_size as f32/100.0);
+                                    let format = Format::new().set_font_color(color).set_font_size(size);
+
+                                    segments.push((format, s)); 
+                                }
+                            }
+                        }
+                    },
+                }
+            }
+        }
+        
+        segments
     }
 
     fn get_raw(&self, lang_id : usize) -> String {
@@ -501,8 +568,7 @@ impl Exporter for HTMLExporter  {
     font-family: 'fot-rodin_prondb';
     
 }
-    td {
-    color: white;
+td {
     border: 1px solid white;
     background: rgb(0 0 0 / 90%);
     border-radius: 10px;
@@ -510,6 +576,7 @@ impl Exporter for HTMLExporter  {
     }
 
 tr {
+    color: white;
     height: 48px;
 }
 </style>
@@ -639,6 +706,93 @@ impl Exporter for CSVExporter {
     }
 }
 
+struct XLSXExporter {
+    filepath: String,
+    workbook : rust_xlsxwriter::Workbook,
+    current_row: usize
+}
+
+impl Exporter for XLSXExporter {
+    fn new(filepath: &Path) -> Self {
+        println!("Creating XLSX file : {}", filepath.display());
+        XLSXExporter { filepath: filepath.display().to_string(), workbook: rust_xlsxwriter::Workbook::new(), current_row : 0 }
+    }
+
+    fn begin(&mut self) {
+        // Add a worksheet to the workbook.
+        let _worksheet = self.workbook.add_worksheet();
+    }
+
+    fn set_headers(&mut self) {
+        if let Ok(worksheet) = self.workbook.worksheet_from_index(0) {
+            let bold = Format::new().set_bold();
+            let dark_bg = Format::new().set_font_color(Color::White).set_background_color(Color::Gray);
+
+            let _ = worksheet.write_row_with_format(0, 0, LANGUAGES_FULL, &bold);
+            let _ = worksheet.set_column_range_format(0, LANGUAGES_COUNT as u16, &dark_bg);
+            if let Err(e) = worksheet.set_column_range_width(0, LANGUAGES_COUNT as u16, 50) {
+                println!("Error setting col width : {e}");
+            }
+           
+
+            self.current_row = 1;
+        }
+    }
+
+    fn add_row(&mut self , msg : &Message, ignore_tags : bool) {
+        if let Ok(worksheet) = self.workbook.worksheet_from_index(0) {
+            for i in 0..LANGUAGES_COUNT {
+                if ignore_tags {
+                    let _ = worksheet.write(self.current_row as u32 , i as u16, msg.get_raw(i));
+                } else {
+                    let mut cell_color = Color::White;
+                    let mut cell_align = FormatAlign::default();
+                    match msg.attribs.get_display_style() {
+                        0x00 => {}, //TODO : add dark background
+                        0x01 => {}, // no background
+                        0x07 => { cell_align = FormatAlign::Center;},
+                        0x0C => {},//"style='font-family: \"reishotai\", \"ＭＳ 明朝\", serif;'",
+                        0x0D => {cell_color = Color::from(COLORS_RGB[5])},//"style='color:#b4c8e6;'",
+                        0x0E => {cell_color = Color::from(COLORS_RGB[2])},//"style='color:#aadc8c;'",
+                        0x13 => { cell_align = FormatAlign::Center;},//"style='text-align: center; font-family: \"reishotai\", \"ＭＳ 明朝\", serif;'",
+                        _ => {}
+                    };
+
+                    
+                    let cell_format = Format::new().set_font_color(cell_color)
+                                                    .set_background_color(Color::Gray)
+                                                    .set_align(cell_align);
+
+                    let segments = msg.get_xlsx_formatted(i, ignore_tags, cell_color);
+                    let segments_ref : Vec<_>= segments.iter().map(|(a,b)| (a,b.as_str())).collect();
+                    match worksheet.write_rich_string_with_format(self.current_row as u32 , i as u16, &segments_ref, &cell_format) {
+                        Ok(_) => {},
+                        Err(e) => {
+                            // println!("Error rich {e}");
+                            // println!("row {}, col {} segments {:?}", self.current_row, i , segments.iter().map(|(_,s)| s).collect::<Vec<_>>());
+                        },
+                    }
+                }
+            }
+            self.current_row += 1;
+    
+        }
+    }
+
+    fn end(&mut self) {
+        // Save the file to disk.
+        if let Ok(worksheet) = self.workbook.worksheet_from_index(0) {
+            worksheet.autofit();
+        }
+        
+        match self.workbook.save(&self.filepath) {
+            Ok(_) => {},
+            Err(e) => println!("Error saving : {e}")
+        };
+    }
+}
+
+
 impl BMGParser {
     fn feed_line(&mut self, line: &str, lang_idx : usize, bank_id : usize) { 
         //println!("{}", line);
@@ -699,6 +853,20 @@ impl BMGParser {
         }
         exporter.end();
     }
+
+
+    fn export_xlsx(&self, filepath: &Path, ignore_tags : bool) {
+        let mut exporter = XLSXExporter::new(filepath);
+        exporter.begin();
+        exporter.set_headers();
+
+        for bank in &self.msgs {
+            for msg in bank.iter().filter(|msg| !msg.is_empty()) {
+                exporter.add_row(msg, ignore_tags);
+            }
+        }
+        exporter.end();
+    }
 }
 
 fn process_file(lines : impl Iterator<Item=std::string::String>, lang_id : usize, bank_id : usize, parser : &mut BMGParser) {
@@ -737,7 +905,6 @@ fn main() {
 
     parser.export_html(Path::new("index.html"), false);
     parser.export_csv(Path::new("textdump.csv"));
+    parser.export_xlsx(Path::new("textdump.xlsx"), false);
 
-    let attrib = "[17,ee/22/ff/,,4]".parse::<MessageAttributes>().unwrap();
-    println!("attrib : {}", parser.msgs[0][0x044e].attribs);
 }
