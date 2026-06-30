@@ -535,7 +535,7 @@ tr {
                 0x00 => "", //TODO : add dark background
                 0x01 => "", // no background
                 0x07 => "style='text-align: center;'",
-                0x0C => "style='font-family: 'reishotai', 'ＭＳ 明朝', serif;",
+                0x0C => "style='font-family: \"reishotai\", \"ＭＳ 明朝\", serif;'",
                 0x0D => "style='color:#b4c8e6;'",
                 0x0E => "style='color:#aadc8c;'",
                 0x13 => "style='text-align: center; font-family: \"reishotai\", \"ＭＳ 明朝\", serif;'",
@@ -720,4 +720,7 @@ fn main() {
 
     parser.export_html(Path::new("index.html"), false);
     parser.export_csv(Path::new("textdump.csv"));
+
+    let attrib = "[17,ee/22/ff/,,4]".parse::<MessageAttributes>().unwrap();
+    println!("attrib : {}", parser.msgs[0][0x044e].attribs);
 }
