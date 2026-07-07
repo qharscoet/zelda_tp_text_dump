@@ -1,8 +1,10 @@
-use std::{default, f32::consts::E, fmt, fs::File, io::{BufRead, BufReader, Write}, path::Path, thread::current};
-use regex::{Captures, Regex};
+use std::{fmt, fs::File, io::{BufRead, BufReader, Write}, path::Path};
+use regex::Regex;
 use rust_xlsxwriter::{Color, Format, FormatAlign};
 use std::sync::LazyLock;
 use itertools::Itertools;
+
+mod bmg_raw_parser;
 
 const BANK_COUNT : usize = 10;
 const FILENAMES : [&str;BANK_COUNT] = [
@@ -72,7 +74,7 @@ struct MessageAttributes {
 
 
 impl MessageAttributes {
-    fn get_message_id(&self) -> u16 {
+    fn _get_message_id(&self) -> u16 {
         get_u16_from_payload(&self.payload, 0)
     }
 
@@ -80,7 +82,7 @@ impl MessageAttributes {
         self.payload[0x05]
     }
 
-    fn get_printing_style(&self) -> u8 {
+    fn _get_printing_style(&self) -> u8 {
         self.payload[0x06]
     }
 
@@ -123,7 +125,7 @@ impl std::str::FromStr for MessageAttributes {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Default)]
 struct Tag {
     group : u8,
     number : u16,
@@ -260,6 +262,22 @@ impl Tag {
 
 impl fmt::Display for Tag {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f,"{}", match self.group {
+            0xFF => {
+                match self.number {
+                    0x00 => "[Color]",
+                    0x01 => "[Size]",
+                    0x02 => "[Ruby]",
+                    _ => "",
+                }
+            },
+            _ => self.get_simple_replacement()
+        })
+    }
+}
+
+impl fmt::Debug for Tag {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f,"{:0>2X}/{:0>4X} payload : {:X?}", self.group, self.number, self.payload)
     }
 }
@@ -292,17 +310,34 @@ impl std::str::FromStr for Tag {
     }
 }
 
-#[derive(Debug)]
+type MessageText = Vec<TextPart>;
 struct Message {
-    text : [String; LANGUAGES_COUNT],
+    text : [MessageText; LANGUAGES_COUNT],
     attribs : MessageAttributes,
     id : usize
 }
 
-#[derive(Debug)]
-enum TextPart<'a> {
-    Text(&'a str),
+enum TextPart {
+    Text(String),
     Tag(Tag)
+}
+
+impl fmt::Display for TextPart {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            TextPart::Text(s) => write!(f, "{}", s),
+            TextPart::Tag(t) => write!(f, "{}", t),
+        }
+    }
+}
+
+impl fmt::Debug for TextPart {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            TextPart::Text(s) => write!(f, "Text : {}", s),
+            TextPart::Tag(t) => write!(f, "Tag : {:?}", t),
+        }
+    }
 }
 
 impl Message {
@@ -312,15 +347,10 @@ impl Message {
 
     fn get_html_formatted(&self, lang_id : usize, ignore_tags : bool) -> String {
         
-        let raw = &self.text[lang_id];
-        let s = raw.replace(r"\n", "<br>");
-
         if ignore_tags {
-            RE_TAG.replace_all(&s, |c : &Captures| c[0].parse::<Tag>().unwrap_or_default().get_simple_replacement().to_owned()).to_string()
+            self.get_raw(lang_id).replace("\n", "<br>")
+            //RE_TAG.replace_all(&s, |c : &Captures| c[0].parse::<Tag>().unwrap_or_default().get_simple_replacement().to_owned()).to_string()
         } else {
-            let tags_it = RE_TAG.find_iter(&self.text[lang_id]).flat_map(|m| m.as_str().parse::<Tag>()).map(|t| TextPart::Tag(t));
-            let str_it = RE_TAG.split(&s).map(|s| TextPart::Text(s));
-
 
             let mut res_str = String::new();
 
@@ -329,10 +359,11 @@ impl Message {
 
             let mut needs_ruby : Option<(u8, String)> = None;
 
-            for part in str_it.interleave(tags_it) {
+            for part in &self.text[lang_id] {
                 match part {
                     TextPart::Text(text) => {
                         if text != "" {
+                            let text = text.replace("\n", "<br>");
                             if let Some((over_count, ruby_text)) = needs_ruby {
                                 let mut chars = text.chars();
                                 let base_text : String = chars.by_ref().take(over_count as usize).collect();
@@ -340,7 +371,7 @@ impl Message {
                                 res_str += &format!("<ruby>{}<rp>(</rp><rt>{}</rt><rp>)</rp></ruby>{}", base_text, ruby_text, remaining_text);
                                 needs_ruby = None;
                             } else {
-                                res_str += text;
+                                res_str += &text;
                             }
                         }
                     },
@@ -393,23 +424,19 @@ impl Message {
     }
 
     fn get_xlsx_formatted(&self, lang_id : usize, ignore_tags : bool, default_color : Color ) -> Vec<(Format, String)> {
-        let raw = &self.text[lang_id];
-        let s = raw.replace(r"\n", "\n");
         let mut segments : Vec<(Format, String)> = Vec::new();
 
         if ignore_tags {
-            segments.push((Format::new(), RE_TAG.replace_all(&s, |c : &Captures| c[0].parse::<Tag>().unwrap_or_default().get_simple_replacement().to_owned()).to_string()));
+            segments.push((Format::new(), self.get_raw(lang_id)));
         } else {
-            let tags_it = RE_TAG.find_iter(&self.text[lang_id]).flat_map(|m| m.as_str().parse::<Tag>()).map(|t| TextPart::Tag(t));
-            let str_it = RE_TAG.split(&s).map(|s| TextPart::Text(s));
-
+            
             let mut current_color = 0;
             let mut current_size = 100;
 
             const DEFAULT_SIZE : f32 = 11.0;
 
 
-            for part in str_it.interleave(tags_it) {
+            for part in &self.text[lang_id] {
                 match part {
                     TextPart::Text(text) => {
                         if !text.is_empty() {
@@ -459,25 +486,29 @@ impl Message {
     }
 
     fn get_raw(&self, lang_id : usize) -> String {
-        let raw = &self.text[lang_id];
-        let s = raw.replace(r"\n", "\n");
-       
-        RE_TAG.replace_all(&s, |c : &Captures| c[0].parse::<Tag>().unwrap_or_default().get_simple_replacement().to_owned()).to_string()
+        self.text[lang_id].iter().map(|text_part| match text_part {
+                TextPart::Text(s) => s.to_string(),
+                TextPart::Tag(t) => t.get_simple_replacement().to_string()
+            }).join("")
     }
 
-    fn print_tags(&self, lang_id : usize) {        
-        let tags_it = RE_TAG.find_iter(&self.text[lang_id]).flat_map(|m| m.as_str().parse::<Tag>()).map(|t| TextPart::Tag(t));
-        let str_it = RE_TAG.split(&self.text[lang_id]).map(|s| TextPart::Text(s));
-        
-        for part in str_it.interleave(tags_it) {
-            println!("{:?}", part);
-        }
-    }
 }
 
 impl fmt::Display for Message {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f,"{:?}", self.text)
+        write!(f,"{:?}", self.text.iter().map(|text_parts| {
+            text_parts.iter().map(|part|
+                part.to_string() ).join("")
+        }).collect::<Vec<_>>())
+    }
+}
+
+impl fmt::Debug for Message {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}",self.text.iter().map(|lang_msg| 
+            lang_msg.iter().map(|part| format!("{:?}", part)).collect::<Vec<_>>().join("\n")
+            ).join("\n ------------------\n")   
+        )
     }
 }
 
@@ -764,13 +795,16 @@ impl Exporter for XLSXExporter {
                                                     .set_align(cell_align);
 
                     let segments = msg.get_xlsx_formatted(i, ignore_tags, cell_color);
-                    let segments_ref : Vec<_>= segments.iter().map(|(a,b)| (a,b.as_str())).collect();
-                    match worksheet.write_rich_string_with_format(self.current_row as u32 , i as u16, &segments_ref, &cell_format) {
-                        Ok(_) => {},
-                        Err(e) => {
-                            // println!("Error rich {e}");
-                            // println!("row {}, col {} segments {:?}", self.current_row, i , segments.iter().map(|(_,s)| s).collect::<Vec<_>>());
-                        },
+
+                    if !segments.is_empty() {
+                        let segments_ref : Vec<_>= segments.iter().map(|(a,b)| (a,b.as_str())).collect();
+                        match worksheet.write_rich_string_with_format(self.current_row as u32 , i as u16, &segments_ref, &cell_format) {
+                            Ok(_) => {},
+                            Err(e) => {
+                                println!("Error rich {e}");
+                                // println!("row {}, col {} segments {:?}", self.current_row, i , segments.iter().map(|(_,s)| s).collect::<Vec<_>>());
+                            },
+                        }
                     }
                 }
             }
@@ -818,7 +852,18 @@ impl BMGParser {
                         println!("ALREADY USED : {}, {:#x}", bank_id, idx);
                     }
 
-                    self.msgs[bank_id][idx].text[lang_idx] = str.as_str().to_string();                    
+                    //self.msgs[bank_id][idx].text[lang_idx] = str.as_str().to_string();       
+
+
+                    {
+                        let s = str.as_str().replace(r"\n", "\n");
+                        let tags_it = RE_TAG.find_iter(&s).flat_map(|m| m.as_str().parse::<Tag>()).map(|t| TextPart::Tag(t));
+                        let str_it = RE_TAG.split(&s).map(|s| TextPart::Text(s.to_string()));
+
+                        let text_parts = str_it.interleave(tags_it).collect::<Vec<_>>();
+
+                        self.msgs[bank_id][idx].text[lang_idx] = text_parts;
+                    }             
                 }
             }
         } else  {
@@ -902,9 +947,9 @@ fn main() {
         process_language(lang_idx,lang, &mut parser);
     }
 
-
     parser.export_html(Path::new("index.html"), false);
     parser.export_csv(Path::new("textdump.csv"));
     parser.export_xlsx(Path::new("textdump.xlsx"), false);
+    bmg_raw_parser::print_bmg("./res/Msgjp/zel_00.bmg");
 
 }
