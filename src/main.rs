@@ -1,10 +1,17 @@
-use std::{fmt, fs::File, io::{BufRead, BufReader, Write}, path::Path};
+use std::{fmt, fs::File, io::{BufRead, BufReader, Write}, os::raw, path::Path};
 use regex::Regex;
 use rust_xlsxwriter::{Color, Format, FormatAlign};
 use std::sync::LazyLock;
 use itertools::Itertools;
 
 mod bmg_raw_parser;
+mod bmg_message;
+mod utils;
+
+use bmg_message::{Message, Tag, TextPart, MessageAttributes, LANGUAGES_COUNT};
+use utils::{get_u16, unpack_u16};
+
+use crate::bmg_message::MessageSingleLang;
 
 const BANK_COUNT : usize = 10;
 const FILENAMES : [&str;BANK_COUNT] = [
@@ -20,7 +27,6 @@ const FILENAMES : [&str;BANK_COUNT] = [
     "zel_99",
 ];
 
-const LANGUAGES_COUNT : usize = 4;
 
 const LANGUAGES : [&str;LANGUAGES_COUNT] = [
     "jp",
@@ -55,53 +61,6 @@ const COLORS_RGB : [&str; 9] = [
     "#dcaa78",
 ];
 
-fn unpack_u16(v:u16) -> (u8,u8) {
-    (((v & 0xFF00) >> 8) as u8, (v & 0x00FF) as u8)
-}
-
-fn get_u16_from_payload(payload : &[u8], idx : usize) -> u16 {
-
-    let v1 = payload[idx];
-    let v2 = payload[idx + 1];
-
-    ((v1 as u16) << 8 | v2 as u16) as u16 
-}
-
-#[derive(Debug)]
-struct MessageAttributes {
-    payload : [u8; 16],
-}
-
-
-impl MessageAttributes {
-    fn _get_message_id(&self) -> u16 {
-        get_u16_from_payload(&self.payload, 0)
-    }
-
-    fn get_display_style(&self) -> u8 {
-        self.payload[0x05]
-    }
-
-    fn _get_printing_style(&self) -> u8 {
-        self.payload[0x06]
-    }
-
-    fn is_empty(&self) -> bool {
-        self.payload.iter().all(|v| *v == 0)
-    }
-}
-
-impl Default for MessageAttributes {
-    fn default() -> Self {
-        MessageAttributes { payload: [0;16]}
-    }
-}
-
-impl fmt::Display for MessageAttributes {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f,"{:X?}", self.payload)
-    }
-}
 
 impl std::str::FromStr for MessageAttributes {
     type Err = &'static str;
@@ -121,16 +80,10 @@ impl std::str::FromStr for MessageAttributes {
             acc
         });
         values.resize(16, 0);
-        Ok(MessageAttributes { payload: values.try_into().unwrap_or([0;16])})
+        Ok(MessageAttributes { payload: values })
     }
 }
 
-#[derive(Default)]
-struct Tag {
-    group : u8,
-    number : u16,
-    payload : Vec<u8>
-}
 
 impl Tag {
     
@@ -310,41 +263,7 @@ impl std::str::FromStr for Tag {
     }
 }
 
-type MessageText = Vec<TextPart>;
-struct Message {
-    text : [MessageText; LANGUAGES_COUNT],
-    attribs : MessageAttributes,
-    id : usize
-}
-
-enum TextPart {
-    Text(String),
-    Tag(Tag)
-}
-
-impl fmt::Display for TextPart {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            TextPart::Text(s) => write!(f, "{}", s),
-            TextPart::Tag(t) => write!(f, "{}", t),
-        }
-    }
-}
-
-impl fmt::Debug for TextPart {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            TextPart::Text(s) => write!(f, "Text : {}", s),
-            TextPart::Tag(t) => write!(f, "Tag : {:?}", t),
-        }
-    }
-}
-
 impl Message {
-    fn is_empty(&self) -> bool {
-        self.text.iter().all(|str| str.is_empty())
-    }
-
     fn get_html_formatted(&self, lang_id : usize, ignore_tags : bool) -> String {
         
         if ignore_tags {
@@ -391,7 +310,7 @@ impl Message {
                                     },
                                     0x01 => {
 
-                                        let new_size = get_u16_from_payload(&tag.payload, 0);
+                                        let new_size = get_u16(&tag.payload, 0);
                                         if current_size != 100 {
                                             res_str += "</span>"
                                         }
@@ -457,7 +376,7 @@ impl Message {
                                     },
                                     0x01 => {
 
-                                        current_size = get_u16_from_payload(&tag.payload, 0);
+                                        current_size = get_u16(&tag.payload, 0);
                                         //Size
                                     },
                                     0x02 => {
@@ -830,6 +749,10 @@ impl Exporter for XLSXExporter {
 impl BMGParser {
     fn feed_line(&mut self, line: &str, lang_idx : usize, bank_id : usize) { 
         //println!("{}", line);
+        if line.is_empty() {
+            return;
+        }
+
         if let Some(groups) = RE.captures(line) {
             let id: usize = usize::from_str_radix(&groups["ID"], 16).unwrap_or_default();
 
@@ -869,6 +792,28 @@ impl BMGParser {
         } else  {
             println!("NO MATCH : {}", line);
         }
+    }
+
+    fn add_message(&mut self, msg: &MessageSingleLang, lang_idx : usize, bank_id : usize) {
+        let idx = msg.id - 1;
+
+        if idx + 1> self.msgs[bank_id].len() { self.msgs[bank_id].resize_with(idx + 1, || Message::default() );}
+
+        self.msgs[bank_id][idx].id = msg.id;
+
+        if self.msgs[bank_id][idx].attribs.is_empty() {
+            self.msgs[bank_id][idx].attribs = msg.attribs.clone();
+        }
+
+
+        if !self.msgs[bank_id][idx].text[lang_idx].is_empty()
+        {
+            println!("ALREADY USED : {}, {:#x}", bank_id, idx);
+        }
+
+        {
+            self.msgs[bank_id][idx].text[lang_idx] = msg.text.clone();
+        }  
     }
 
     fn export_html(&self, filepath: &Path, ignore_tags : bool) {
@@ -920,21 +865,35 @@ fn process_file(lines : impl Iterator<Item=std::string::String>, lang_id : usize
     for l in iter {
         parser.feed_line(&l, lang_id, bank_id);
     }
-
 }
 
-fn process_language(lang_idx : usize, lang_id : &str, parser : &mut BMGParser) {
+fn process_raw_bmg(filename : &Path, lang_id : usize, bank_id : usize, parser : &mut BMGParser) {
+
+    println!("opening raw bmg {}", filename.display());
+    if let Ok(raw_parser) = bmg_raw_parser::open_bmg(filename) {
+        for m in raw_parser.get_all_messages() {
+            parser.add_message(&m, lang_id, bank_id);
+        }
+    }
+}
+
+fn process_language(lang_idx : usize, lang_id : &str, parser : &mut BMGParser, use_raw : bool) {
     let str_path = &format!("./res/Msg{}", lang_id);
     let folder_path = Path::new(&str_path);
 
     for (bank_id,&basename) in FILENAMES.iter().enumerate() {
-        let filename = basename.to_owned() + ".txt";
-        println!("{} {}", lang_id, filename);
-        if let Ok(file) = File::open(folder_path.join(&filename)) {
-            let buf_reader = BufReader::new(file);
-            process_file(buf_reader.lines().flatten(),lang_idx, bank_id,  parser);
+        if use_raw {
+            let filename = basename.to_owned() + ".bmg";
+            process_raw_bmg(&folder_path.join(&filename), lang_idx, bank_id, parser);
         } else {
-            println!("Couldn't open file {}" , filename);
+            let filename = basename.to_owned() + ".txt";
+            println!("{} {}", lang_id, filename);
+            if let Ok(file) = File::open(folder_path.join(&filename)) {
+                let buf_reader = BufReader::new(file);
+                process_file(buf_reader.lines().flatten(),lang_idx, bank_id,  parser);
+            } else {
+                println!("Couldn't open file {}" , filename);
+            }
         }
     }
 }
@@ -944,12 +903,12 @@ fn main() {
     let mut parser : BMGParser = Default::default();
     
     for (lang_idx, lang) in LANGUAGES.iter().enumerate() {
-        process_language(lang_idx,lang, &mut parser);
+        process_language(lang_idx,lang, &mut parser, true);
     }
 
     parser.export_html(Path::new("index.html"), false);
     parser.export_csv(Path::new("textdump.csv"));
     parser.export_xlsx(Path::new("textdump.xlsx"), false);
-    bmg_raw_parser::print_bmg("./res/Msgjp/zel_00.bmg");
+    // bmg_raw_parser::print_bmg(Path::new("./res/Msgjp/zel_00.bmg"));
 
 }

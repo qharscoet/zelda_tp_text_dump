@@ -1,16 +1,13 @@
 use std::{
-    cmp::min, fmt::{self, Display}, fs::File, io::{self, Read}, ops::Range, str::Utf8Error,
+    cmp::min, fmt::{self, Display}, fs::File, io::{self, Read}, ops::Range, path::Path, str::Utf8Error,
 };
 
+use itertools::Itertools;
 use thiserror::Error;
 
-fn get_u32(data: &[u8], idx: usize) -> u32 {
-    u32::from_be_bytes(data[idx..idx + 4].try_into().unwrap())
-}
+use crate::bmg_message::{MessageAttributes, MessageSingleLang, MessageText, Tag, TextPart, get_raw_msg};
+use crate::utils::{get_u16, get_u32};
 
-fn get_u16(data: &[u8], idx: usize) -> u16 {
-    u16::from_be_bytes(data[idx..idx + 2].try_into().unwrap())
-}
 
 #[derive(Error, Debug)]
 pub enum BMGParseError {
@@ -54,17 +51,42 @@ struct DAT1Data {
 
 impl DAT1Data {
     
-    fn get_text_at(&self,offset:usize, encoding : u8) -> String {
-        let bytes : Vec<u8> = self.data[offset..].iter().take_while(|&&b| b != 0x00).map(|b| *b).collect();
-        println!("Bytes at offset {}: {:X?}", offset, bytes);
+    fn get_msg_at(&self,offset:usize, encoding : u8) -> MessageText {
+
+        if self.data[offset] == 0x00 {
+            return Vec::new();
+        }
+        
         let encoding = match encoding {
             1 => encoding_rs::WINDOWS_1252,
             3 => encoding_rs::SHIFT_JIS,
             _ => encoding_rs::WINDOWS_1252, // Default to WINDOWS_1252 if unknown
         };
-        let s = encoding.decode(&bytes);
-        // Placeholder implementation
-        format!("Text at offset {} : {}", offset, s.0)
+
+        let mut it = self.data[offset..].iter().peekable();
+        let mut end = false;
+        let mut full_string = String::new();
+        let mut text_parts : Vec<TextPart> = Vec::new();
+        while !end {
+            let str_bytes = it.peeking_take_while(|&&b| b!=0x00 && b!=0x1A).map(|b| *b).collect::<Vec<_>>();
+            let str = encoding.decode(&str_bytes).0;
+
+            full_string += &str;
+            text_parts.push(TextPart::Text(str.to_string()));
+            
+            match it.next().unwrap_or(&0x00) {
+                0x00 => end = true,
+                0x1A => {
+                    let size_bytes = it.next().unwrap_or(&0x00);
+                    let text_tag = it.by_ref().take(*size_bytes as usize - 2).map(|b| *b).collect::<Vec<_>>(); //Accounting for the 0x1A and size byte
+                    text_parts.push(TextPart::Tag(Tag::from(&text_tag)));
+                },
+                _ => {}
+            }
+        }
+
+        text_parts
+        
     }
 }
 
@@ -117,7 +139,7 @@ impl BMGData {
     }
 }
 
-struct BMGRawParser {
+pub struct BMGRawParser {
     data: Vec<u8>,
     data_parsed: BMGData,
 }
@@ -178,7 +200,7 @@ impl BMGRawParser {
                 BMGSectionData::DAT1(dat1data) => {
                     println!("\t DAT1 Section: data length={}", dat1data.data.len());
                     println!("\t First 10 bytes: {:X?}", &dat1data.data[0..10]);
-                    println!("\t First message: {}", dat1data.get_text_at(1, header.encoding));
+                    println!("\t First message: {:#?}", dat1data.get_msg_at(1, header.encoding));
                 },
                 BMGSectionData::MID1(mid1data) => {
                     println!("\t MID1 Section: count {}", mid1data.count);
@@ -219,8 +241,6 @@ impl BMGRawParser {
                 let entry_size = get_u16(&section_data,  0x02);
                 let pad = get_u32(&section_data, 0x04);
 
-                println!("INF1 Section: count={}, entry_size={}, pad={}", count, entry_size, pad);
-
                 let entries = section_data[0x08..].chunks_exact(entry_size as usize).map(|entry| {
                     let entry_offset_value = get_u32(&entry, 0x00);
                     let attributes = entry[0x04..].to_vec();
@@ -236,8 +256,6 @@ impl BMGRawParser {
                 }))
             }
             "DAT1" => {
-                println!("DAT1 Section: size={}", section_data.len());
-                println!("First 10 bytes: {:X?}", &data[offset..offset+10]);
                 Ok(BMGSectionData::DAT1(DAT1Data { data: section_data.to_vec()}))
             },
             "MID1" => {
@@ -286,21 +304,44 @@ impl BMGRawParser {
     }
 
 
-    pub fn get_msg(&self, id : usize) -> String {
+    pub fn get_msg(&self, id : usize) -> MessageSingleLang {
         if let Some(BMGSectionData::INF1(inf1)) = self.get_section(BMGData::INF1) {
             if let Some(BMGSectionData::DAT1(dat1)) = self.get_section(BMGData::DAT1) {
-                dat1.get_text_at(inf1.entries[id].offset as usize, self.data_parsed.header.encoding)
+                let inf1_entry = &inf1.entries[id];
+                let data = dat1.get_msg_at(inf1_entry.offset as usize, self.data_parsed.header.encoding);
+
+                let id = if let Some(BMGSectionData::MID1(mid1)) = self.get_section(BMGData::MID1) {
+                    mid1.ids[id]
+                } else { 0 } as usize;
+
+                let attribs = &inf1_entry.attributes;
+
+                MessageSingleLang {
+                    id : id,
+                    attribs : MessageAttributes{payload : attribs.clone()},
+                    text : data
+                }
             } else {
-                String::new()
+                MessageSingleLang::default()
             }
         } else {
-            String::new()
+            MessageSingleLang::default()
         }
+    }
+
+    pub fn get_all_messages(&self) -> Vec<MessageSingleLang> {
+       if let Some(BMGSectionData::INF1(inf1)) = self.get_section(BMGData::INF1) {
+            (0..inf1.count).map(|i| {
+                self.get_msg(i as usize)
+            }).collect()
+       } else {
+        Vec::new()
+       }
     }
 }
 
 
-fn open_bmg(filename: &str, bank_index: usize) -> Result<BMGRawParser, io::Error> {
+pub fn open_bmg(filename: &Path) -> Result<BMGRawParser, io::Error> {
     let mut file = File::open(filename)?;
     let mut buffer = Vec::new();
     file.read_to_end(&mut buffer)?;
@@ -309,12 +350,10 @@ fn open_bmg(filename: &str, bank_index: usize) -> Result<BMGRawParser, io::Error
 }
 
 
-pub fn print_bmg(path : &str) {
-    match open_bmg(path, 0) {
+pub fn print_bmg(path : &Path) {
+    match open_bmg(path) {
         Ok(parser) => {
-            parser.print();
-
-            println!("Message 0x66 : {}", parser.get_msg(0x66));
+            println!("Message 0x66 : {}", get_raw_msg(parser.get_msg(0x66).text));
         }
         Err(e) => {
             eprintln!("Error opening BMG file: {}", e);
