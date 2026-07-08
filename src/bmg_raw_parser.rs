@@ -304,14 +304,14 @@ impl BMGRawParser {
     }
 
 
-    pub fn get_msg(&self, id : usize) -> MessageSingleLang {
+    pub fn get_msg(&self, idx : usize) -> MessageSingleLang {
         if let Some(BMGSectionData::INF1(inf1)) = self.get_section(BMGData::INF1) {
             if let Some(BMGSectionData::DAT1(dat1)) = self.get_section(BMGData::DAT1) {
-                let inf1_entry = &inf1.entries[id];
+                let inf1_entry = &inf1.entries[idx];
                 let data = dat1.get_msg_at(inf1_entry.offset as usize, self.data_parsed.header.encoding);
 
                 let id = if let Some(BMGSectionData::MID1(mid1)) = self.get_section(BMGData::MID1) {
-                    mid1.ids[id]
+                    mid1.ids[idx]
                 } else { 0 } as usize;
 
                 let attribs = &inf1_entry.attributes;
@@ -353,7 +353,8 @@ pub fn open_bmg(filename: &Path) -> Result<BMGRawParser, io::Error> {
 pub fn print_bmg(path : &Path) {
     match open_bmg(path) {
         Ok(parser) => {
-            println!("Message 0x66 : {}", get_raw_msg(parser.get_msg(0x66).text));
+            parser.print();
+            // println!("Message 0x66 : {}", get_raw_msg(parser.get_msg(0x66).text));
         }
         Err(e) => {
             eprintln!("Error opening BMG file: {}", e);

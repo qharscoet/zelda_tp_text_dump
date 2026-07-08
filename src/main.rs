@@ -808,9 +808,10 @@ impl BMGParser {
 
         if !self.msgs[bank_id][idx].text[lang_idx].is_empty()
         {
-            println!("ALREADY USED : {}, {:#x}", bank_id, idx);
-        }
-
+            println!("ALREADY USED : {}, {:#x}, lang {}", bank_id, idx, lang_idx);
+            println!("Prev : {}", self.msgs[bank_id][idx] );
+            println!("New: {:?}", msg.text );
+        } else 
         {
             self.msgs[bank_id][idx].text[lang_idx] = msg.text.clone();
         }  
