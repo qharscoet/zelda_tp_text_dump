@@ -751,7 +751,7 @@ fn process_language(lang_idx : usize, lang_id : &str, parser : &mut BMGParser, u
     let folder_path = Path::new(&str_path);
 
     for (bank_id,&basename) in FILENAMES.iter().enumerate() {
-        
+
         let filename = basename.to_owned() + if use_raw {".bmg"} else {".txt"};
         let _ = process_file(&folder_path.join(&filename), lang_idx, bank_id, parser);
     }
@@ -768,6 +768,6 @@ fn main() {
     parser.export_html(Path::new("index.html"), false);
     parser.export_csv(Path::new("textdump.csv"));
     parser.export_xlsx(Path::new("textdump.xlsx"), false);
-    // bmg_raw_parser::print_bmg(Path::new("./res/Msgjp/zel_00.bmg"));
+    bmg_raw_parser::print_bmg(Path::new("./res/Msgjp/zel_00.bmg"));
 
 }

@@ -5,7 +5,7 @@ use std::{
 use itertools::Itertools;
 use thiserror::Error;
 
-use crate::bmg_message::{MessageAttributes, MessageParser, MessageSingleLang, MessageText, Tag, TextPart};
+use crate::bmg_message::{self, MessageAttributes, MessageParser, MessageSingleLang, MessageText, Tag, TextPart};
 use crate::utils::{get_u16, get_u32};
 
 
@@ -16,10 +16,11 @@ pub enum BMGParseError {
 
     #[error("unknown data store error")]
     #[allow(dead_code)]
-    Unknown,
+    UnknownSectionID,
 }
 
 #[derive(Clone)]
+#[allow(dead_code)]
 struct BMGHeader {
     magic: String,
     filesize: u32,
@@ -39,6 +40,7 @@ impl fmt::Display for INF1Entry {
     }
 }
 
+#[allow(dead_code)]
 struct INF1Data {
     count : u16,
     entry_size : u16,
@@ -91,6 +93,7 @@ impl DAT1Data {
     }
 }
 
+#[allow(dead_code)]
 struct MID1Data {
     count : u16,
     _format : u16,
@@ -99,13 +102,53 @@ struct MID1Data {
 }
 
 
+#[derive(Debug)]
+
+#[allow(dead_code)]
+enum FLW1Node {
+    Continuation {id : u8, doorquery : u8, inf1_idx : u16, next_node : u16, _pad : u16},
+    Branch {id : u8, doorquery : u8, query_fn : u16, param : u16, indir_offset : u16},
+    Event {id : u8, event_fn : u8, indir_idx : u16, params : u32}
+}
+
+#[derive(Debug)]
+#[allow(dead_code)]
+struct FLW1Data {
+    node_count : u16,
+    ind_count : u16,
+    _pad : u32,
+
+    nodes : Vec<FLW1Node>,
+    ind_table : Vec<u16>
+
+}
+
+#[derive(Debug)]
+#[allow(dead_code)]
+struct FLI1Entry {
+    id : u16,
+    _pad : u16,
+    node_idx : u16,
+    _pad2 : u16
+}
+
+#[derive(Debug)]
+#[allow(dead_code)]
+struct FLI1Data {
+    count : u16,
+    entries : Vec<FLI1Entry>,
+}
+
+#[allow(dead_code)]
 enum BMGSectionData {
     INF1(INF1Data),
     DAT1(DAT1Data),
     MID1(MID1Data),
-    FLW1,
-    FLI1
+    FLW1(FLW1Data),
+    FLI1(FLI1Data)
 }
+
+#[allow(dead_code)]
 struct BMGSection {
     section_type: String,
     size: u32,
@@ -163,10 +206,12 @@ impl BMGRawParser {
     }
 
 
+    #[allow(dead_code)]
     fn get_header(&self) -> &BMGHeader {
         &self.data_parsed.header
     }
 
+    #[allow(dead_code)]
     fn get_sections(&self) -> &[Option<BMGSection>; BMGData::SECTION_COUNT] {
         &self.data_parsed.sections
     }
@@ -209,8 +254,24 @@ impl BMGRawParser {
                     println!("\t ID[0] : {}", mid1data.ids[0]);
                     println!("\t ID[1] : {}", mid1data.ids[1]);
                     println!("\t ID[2] : {}", mid1data.ids[2]);
-                }
-                _ => {}
+                },
+                BMGSectionData::FLW1(flw1data) => {
+                    println!("\t FLW1 Section: Node count {}", flw1data.node_count);
+                    println!("\t FLW1 Section: Indirection count {}", flw1data.ind_count);
+                    println!("\t FLW1 Section: Nodes[0] {:X?}", flw1data.nodes[0]);
+                    println!("\t FLW1 Section: Nodes[1] {:X?}", flw1data.nodes[1]);
+                    println!("\t FLW1 Section: Nodes[2] {:X?}", flw1data.nodes[2]);
+                    println!("\t FLW1 Section: Indir[0] {:X?}", flw1data.ind_table[0]);
+                    println!("\t FLW1 Section: Indir[1] {:X?}", flw1data.ind_table[1]);
+                    println!("\t FLW1 Section: Indir[2] {:X?}", flw1data.ind_table[2]);
+
+                },
+                BMGSectionData::FLI1(fli1data) => {
+                    println!("\t FLI1 Section: Node count {}", fli1data.count);
+                    println!("\t FLI1 Section: Nodes[0] {:X?}", fli1data.entries[0]);
+                    println!("\t FLI1 Section: Nodes[1] {:X?}", fli1data.entries[1]);
+                    println!("\t FLI1 Section: Nodes[2] {:X?}", fli1data.entries[2]);
+                },
             }
         }
     }
@@ -247,7 +308,7 @@ impl BMGRawParser {
                     let attributes = entry[0x04..].to_vec();
 
                     INF1Entry{offset:entry_offset_value, attributes}
-                }).collect();
+                }).take(count as usize).collect();
 
                 Ok(BMGSectionData::INF1(INF1Data {
                     count,
@@ -269,7 +330,33 @@ impl BMGRawParser {
 
                 Ok(BMGSectionData::MID1(MID1Data { count, _format : format, _unknown: unknown, ids: ids}))
             }
-            _ => Ok(BMGSectionData::FLW1), // Placeholder for other section types
+            "FLW1" => {
+                let count = get_u16(&section_data, 0x00);
+                let indir_count = get_u16(&section_data, 0x02);
+                let pad = get_u32(&section_data, 0x04);
+
+                let nodes = section_data[0x08..].chunks_exact(8).filter_map(|bytes| 
+                    match bytes[0x00] {
+                        0x01 => Some(FLW1Node::Continuation { id: bytes[0x00], doorquery: bytes[0x01], inf1_idx: get_u16(&bytes, 0x02), next_node: get_u16(&bytes, 0x04), _pad: get_u16(&bytes, 0x06) }),
+                        0x02 => Some(FLW1Node::Branch { id: bytes[0x00], doorquery: bytes[0x01], query_fn: get_u16(&bytes, 0x02), param: get_u16(&bytes, 0x04), indir_offset: get_u16(&bytes, 0x06) }),
+                        0x03 => Some(FLW1Node::Event { id: bytes[0x00], event_fn: bytes[0x01], indir_idx: get_u16(&bytes, 0x02), params: get_u32(&bytes, 0x04)}),
+                        _ => None
+                    }
+                ).take(count as usize);
+
+                let indir_start_offset = (0x08 + count * 8) as usize;
+                let indir_table = section_data[indir_start_offset..].chunks_exact(2).map(|v| get_u16(v, 0)).take(indir_count as usize);
+                Ok(BMGSectionData::FLW1(FLW1Data { node_count:count , ind_count: indir_count, _pad: pad, nodes: nodes.collect(), ind_table: indir_table.collect() }))
+            },
+            "FLI1" => {
+                 let count = get_u16(&section_data, 0x00);
+
+                 let indices = section_data[0x08..].chunks_exact(8).map(|bytes|
+                    FLI1Entry {id : get_u16(&bytes,0x00), _pad : get_u16(&bytes, 0x02), node_idx : get_u16(&bytes, 0x04), _pad2 : get_u16(&bytes, 0x06)}
+                    ).take(count as usize);
+                Ok(BMGSectionData::FLI1(FLI1Data { count: count, entries: indices.collect() }))
+            }
+            _ => Err(BMGParseError::UnknownSectionID)
 
         }
 
@@ -329,6 +416,54 @@ impl BMGRawParser {
             MessageSingleLang::default()
         }
     }
+
+    fn print_flow_chain(&self,flow_node_idx : usize, visited: &mut Vec<bool>) {
+        if let Some(BMGSectionData::FLW1(flw1)) = self.get_section(BMGData::FLW1) {
+            visited[flow_node_idx] = true;
+
+            match &flw1.nodes[flow_node_idx] {
+                FLW1Node::Continuation { id : _, doorquery : _, inf1_idx, next_node, _pad } =>  {
+                    let m = self.get_msg(*inf1_idx as usize);
+                    println!("INF1 {:X} : {}",inf1_idx,  bmg_message::get_raw_msg(&m.text));
+    
+                    if *next_node != 0xFFFF {
+                        self.print_flow_chain(*next_node as usize, visited);
+                    }
+                }
+                FLW1Node::Branch { id:_, doorquery:_, query_fn:_, param:_, indir_offset } => {
+                    println!("Branch");
+
+                    let base_next_node = &flw1.ind_table[*indir_offset as usize];
+                    if *base_next_node != 0xFFFF {
+                        self.print_flow_chain(*base_next_node as usize, visited);
+                    }
+
+                },
+                FLW1Node::Event { id : _, event_fn, indir_idx, params: _ } => {
+                    println!("Running Event {}", event_fn);
+
+                    let next_node = &flw1.ind_table[*indir_idx as usize];
+                    if *next_node != 0xFFFF {
+                        self.print_flow_chain(*next_node as usize, visited);
+                    }
+                    
+                },
+            }
+        }
+    }
+
+    fn print_flow(&self) {
+        if let Some(BMGSectionData::FLW1(flw1)) = self.get_section(BMGData::FLW1) {
+
+            let mut visited = vec![false; flw1.node_count as usize];
+            while let Some(idx) = (0..flw1.node_count).find(|node| !visited[*node as usize] && matches!(flw1.nodes[*node as usize] ,FLW1Node::Continuation { .. })) {
+                println!("------------");
+                self.print_flow_chain(idx as usize, &mut visited);
+            }
+
+
+        }
+    }
 }
 
 impl MessageParser for BMGRawParser {
@@ -356,7 +491,8 @@ pub fn open_bmg(filename: &Path) -> Result<BMGRawParser, io::Error> {
 pub fn print_bmg(path : &Path) {
     match open_bmg(path) {
         Ok(parser) => {
-            parser.print();
+            //parser.print();
+            parser.print_flow();
             // println!("Message 0x66 : {}", get_raw_msg(parser.get_msg(0x66).text));
         }
         Err(e) => {
