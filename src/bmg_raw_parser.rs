@@ -491,8 +491,8 @@ pub fn open_bmg(filename: &Path) -> Result<BMGRawParser, io::Error> {
 pub fn print_bmg(path : &Path) {
     match open_bmg(path) {
         Ok(parser) => {
-            //parser.print();
-            parser.print_flow();
+            parser.print();
+            // parser.print_flow();
             // println!("Message 0x66 : {}", get_raw_msg(parser.get_msg(0x66).text));
         }
         Err(e) => {

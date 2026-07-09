@@ -663,7 +663,8 @@ impl Exporter for XLSXExporter {
 
 impl BMGParser {
     fn add_message(&mut self, msg: &MessageSingleLang, lang_idx : usize, bank_id : usize) {
-        let idx = msg.id - 1;
+
+        let idx = if msg.id > 0 {msg.id - 1} else {self.msgs[bank_id].len()};
 
         if idx + 1> self.msgs[bank_id].len() { self.msgs[bank_id].resize_with(idx + 1, || Message::default() );}
 
@@ -768,6 +769,15 @@ fn main() {
     parser.export_html(Path::new("index.html"), false);
     parser.export_csv(Path::new("textdump.csv"));
     parser.export_xlsx(Path::new("textdump.xlsx"), false);
-    bmg_raw_parser::print_bmg(Path::new("./res/Msgjp/zel_00.bmg"));
+
+
+
+
+    // let mut tww_parser = BMGParser::default();
+    // let _ = process_file(Path::new("./res/TWW/zel_00.bmg"), 0, 0, &mut tww_parser);
+
+    // tww_parser.export_csv(Path::new("tww.csv"));
+    // tww_parser.export_html(Path::new("tww.html"), false);
+    //bmg_raw_parser::print_bmg(Path::new("./res/TWW/zel_00.bmg"));
 
 }
