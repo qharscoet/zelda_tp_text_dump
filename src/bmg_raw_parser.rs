@@ -1,11 +1,11 @@
 use std::{
-    cmp::min, fmt::{self, Display}, fs::File, io::{self, Read}, ops::Range, path::Path, str::Utf8Error,
+    cmp::min, fmt::{self}, fs::File, io::{self, Read}, ops::Range, path::Path, str::Utf8Error,
 };
 
 use itertools::Itertools;
 use thiserror::Error;
 
-use crate::bmg_message::{MessageAttributes, MessageSingleLang, MessageText, Tag, TextPart, get_raw_msg};
+use crate::bmg_message::{MessageAttributes, MessageParser, MessageSingleLang, MessageText, Tag, TextPart};
 use crate::utils::{get_u16, get_u32};
 
 
@@ -15,6 +15,7 @@ pub enum BMGParseError {
     InvalidSectionID(#[from] Utf8Error),
 
     #[error("unknown data store error")]
+    #[allow(dead_code)]
     Unknown,
 }
 
@@ -41,7 +42,7 @@ impl fmt::Display for INF1Entry {
 struct INF1Data {
     count : u16,
     entry_size : u16,
-    pad : u32,
+    _pad : u32,
     entries : Vec<INF1Entry>,
 }
 
@@ -140,7 +141,7 @@ impl BMGData {
 }
 
 pub struct BMGRawParser {
-    data: Vec<u8>,
+    _data: Vec<u8>,
     data_parsed: BMGData,
 }
 
@@ -158,7 +159,7 @@ impl BMGRawParser {
             sections: [const { None } ;6],
         });
 
-       BMGRawParser { data, data_parsed: parsed}
+       BMGRawParser { _data : data, data_parsed: parsed}
     }
 
 
@@ -191,7 +192,7 @@ impl BMGRawParser {
             println!("Section data range: {:?}", section.range);
 
             match &section.data {
-                BMGSectionData::INF1(INF1Data{count,entry_size, pad, entries})=> {
+                BMGSectionData::INF1(INF1Data{count,entry_size, _pad, entries})=> {
                     println!("\t INF1 Section: count={}, entry_size={}, entry_len={}", count, entry_size, entries.len());
                     println!("\t Entry 0: {}", entries[0]);
                     println!("\t Entry 1: {}", entries[1]);
@@ -251,7 +252,7 @@ impl BMGRawParser {
                 Ok(BMGSectionData::INF1(INF1Data {
                     count,
                     entry_size,
-                    pad,
+                    _pad : pad,
                     entries,
                 }))
             }
@@ -328,8 +329,10 @@ impl BMGRawParser {
             MessageSingleLang::default()
         }
     }
+}
 
-    pub fn get_all_messages(&self) -> Vec<MessageSingleLang> {
+impl MessageParser for BMGRawParser {
+    fn get_all_messages(&self) -> Vec<MessageSingleLang> {
        if let Some(BMGSectionData::INF1(inf1)) = self.get_section(BMGData::INF1) {
             (0..inf1.count).map(|i| {
                 self.get_msg(i as usize)
@@ -340,7 +343,6 @@ impl BMGRawParser {
     }
 }
 
-
 pub fn open_bmg(filename: &Path) -> Result<BMGRawParser, io::Error> {
     let mut file = File::open(filename)?;
     let mut buffer = Vec::new();
@@ -350,6 +352,7 @@ pub fn open_bmg(filename: &Path) -> Result<BMGRawParser, io::Error> {
 }
 
 
+#[allow(dead_code)]
 pub fn print_bmg(path : &Path) {
     match open_bmg(path) {
         Ok(parser) => {

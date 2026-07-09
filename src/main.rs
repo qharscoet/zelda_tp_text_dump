@@ -1,17 +1,15 @@
-use std::{fmt, fs::File, io::{BufRead, BufReader, Write}, os::raw, path::Path};
-use regex::Regex;
+use std::{fmt, fs::File, io::{self, Write}, path::Path};
 use rust_xlsxwriter::{Color, Format, FormatAlign};
-use std::sync::LazyLock;
-use itertools::Itertools;
 
 mod bmg_raw_parser;
+mod bmg_text_parser;
 mod bmg_message;
 mod utils;
 
-use bmg_message::{Message, Tag, TextPart, MessageAttributes, LANGUAGES_COUNT};
-use utils::{get_u16, unpack_u16};
+use bmg_message::{Message, Tag, TextPart, LANGUAGES_COUNT};
+use utils::{get_u16};
 
-use crate::bmg_message::MessageSingleLang;
+use crate::bmg_message::{MessageParser, MessageSingleLang};
 
 const BANK_COUNT : usize = 10;
 const FILENAMES : [&str;BANK_COUNT] = [
@@ -46,8 +44,7 @@ const LANGUAGES_FULL : [&str;LANGUAGES_COUNT] = [
     // "Italian"
 ];
 
-static RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?P<ID>[[:xdigit:]]+) (@(?P<slot>[[:xdigit:]]{4}) )?(?P<attribs>\[.+\]) = (?P<str>.+)?").unwrap());
-static RE_TAG: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\\[x|z]\{(.*?)\}").unwrap());
+
 
 const COLORS_RGB : [&str; 9] = [
     "#FFFFFF",
@@ -60,29 +57,6 @@ const COLORS_RGB : [&str; 9] = [
     "#ffffff",
     "#dcaa78",
 ];
-
-
-impl std::str::FromStr for MessageAttributes {
-    type Err = &'static str;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let mut values = s.split_inclusive(&[',', '/']).fold(Vec::new(), |mut acc, s| {
-            if s.ends_with(',') {
-                acc.push(u8::from_str_radix(&s[0..s.len() -1], 16).unwrap_or_default());
-            } else if s.ends_with('/') {
-                acc.push(u8::from_str_radix(&s[0..s.len() -1], 16).unwrap_or_default());
-                let curr_len = acc.len();
-                let next_len = ((curr_len + 4)/4) * 4; //align to next 32
-                acc.resize(next_len, 0);
-
-            } else {
-                acc.push(u8::from_str_radix(s, 16).unwrap_or_default());
-            };
-            acc
-        });
-        values.resize(16, 0);
-        Ok(MessageAttributes { payload: values })
-    }
-}
 
 
 impl Tag {
@@ -229,40 +203,6 @@ impl fmt::Display for Tag {
     }
 }
 
-impl fmt::Debug for Tag {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f,"{:0>2X}/{:0>4X} payload : {:X?}", self.group, self.number, self.payload)
-    }
-}
-
-impl std::str::FromStr for Tag {
-    type Err = &'static str;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        
-        if let Some(caps) = RE_TAG.captures(s) {
-            let args = caps.get(1).map_or("", |m| m.as_str());
-            let values = args.split(",").collect::<Vec<_>>();
-
-            let x_escape = s.starts_with(r"\x");
-            let start_idx = x_escape as usize;
-
-            if x_escape {
-                let (_total_size, group) = unpack_u16(u16::from_str_radix(values[start_idx], 16).unwrap_or_default());
-    
-                let number = u16::from_str_radix(values[start_idx + 1], 16).unwrap();
-                let payload : Vec<_> = values[start_idx+2..].iter().flat_map(|s| u16::from_str_radix(s, 16)).map(|v| unpack_u16(v)).flat_map(|(v1,v2)| [v1,v2]).collect();
-                // println!("{:#x}, {:#x}, {:?}", total_size, group, payload);
-
-                Ok(Tag { group:group, number:number, payload:payload})
-            } else {
-                Err("Z escapes not implemented yet")
-            }
-        } else  {
-            Err("Couldn't capture data")
-        }
-    }
-}
-
 impl Message {
     fn get_html_formatted(&self, lang_id : usize, ignore_tags : bool) -> String {
         
@@ -321,7 +261,6 @@ impl Message {
                                         current_size = new_size;
                                     },
                                     0x02 => {
-                                        // todo!()
                                         let over_count = tag.payload[0];
                                         let raw_shiftjs : Vec<_>= tag.payload[1..].iter().map(|v| *v).collect();
                                         let decoded_ruby = encoding_rs::SHIFT_JIS.decode(&raw_shiftjs).0;
@@ -405,36 +344,9 @@ impl Message {
     }
 
     fn get_raw(&self, lang_id : usize) -> String {
-        self.text[lang_id].iter().map(|text_part| match text_part {
-                TextPart::Text(s) => s.to_string(),
-                TextPart::Tag(t) => t.get_simple_replacement().to_string()
-            }).join("")
+        bmg_message::get_raw_msg(&self.text[lang_id])
     }
 
-}
-
-impl fmt::Display for Message {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f,"{:?}", self.text.iter().map(|text_parts| {
-            text_parts.iter().map(|part|
-                part.to_string() ).join("")
-        }).collect::<Vec<_>>())
-    }
-}
-
-impl fmt::Debug for Message {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}",self.text.iter().map(|lang_msg| 
-            lang_msg.iter().map(|part| format!("{:?}", part)).collect::<Vec<_>>().join("\n")
-            ).join("\n ------------------\n")   
-        )
-    }
-}
-
-impl Default for Message {
-    fn default() -> Self {
-        Message { text: Default::default(), attribs: MessageAttributes::default(), id : 0}
-    }
 }
 
 
@@ -445,6 +357,7 @@ struct BMGParser {
 
 impl BMGParser {
     
+    #[allow(dead_code)]
     fn print(self) {
         for (bank_id,msg_bank) in self.msgs.iter().enumerate() {
             for (idx, msg) in msg_bank.iter().filter(|msg| !msg.is_empty()).enumerate() {
@@ -711,7 +624,9 @@ impl Exporter for XLSXExporter {
                     
                     let cell_format = Format::new().set_font_color(cell_color)
                                                     .set_background_color(Color::Gray)
-                                                    .set_align(cell_align);
+                                                    .set_align(cell_align)
+                                                    .set_text_wrap();
+                                                    
 
                     let segments = msg.get_xlsx_formatted(i, ignore_tags, cell_color);
 
@@ -747,53 +662,6 @@ impl Exporter for XLSXExporter {
 
 
 impl BMGParser {
-    fn feed_line(&mut self, line: &str, lang_idx : usize, bank_id : usize) { 
-        //println!("{}", line);
-        if line.is_empty() {
-            return;
-        }
-
-        if let Some(groups) = RE.captures(line) {
-            let id: usize = usize::from_str_radix(&groups["ID"], 16).unwrap_or_default();
-
-            if id > 0 {
-                //let slot = usize::from_str_radix(&groups["slot"], 16).unwrap();
-                let idx = id -1;
-                if idx + 1> self.msgs[bank_id].len() { self.msgs[bank_id].resize_with(idx + 1, || Message::default() );}
-           
-                self.msgs[bank_id][idx].id = id;
-
-                if self.msgs[bank_id][idx].attribs.is_empty() {
-                    let attribs = &groups["attribs"][1..groups["attribs"].len()-1];
-                    self.msgs[bank_id][idx].attribs = attribs.parse().unwrap_or_default()
-                }
-
-                if let Some(str) = groups.name("str")
-                {
-                    if !self.msgs[bank_id][idx].text[lang_idx].is_empty()
-                    {
-                        println!("ALREADY USED : {}, {:#x}", bank_id, idx);
-                    }
-
-                    //self.msgs[bank_id][idx].text[lang_idx] = str.as_str().to_string();       
-
-
-                    {
-                        let s = str.as_str().replace(r"\n", "\n");
-                        let tags_it = RE_TAG.find_iter(&s).flat_map(|m| m.as_str().parse::<Tag>()).map(|t| TextPart::Tag(t));
-                        let str_it = RE_TAG.split(&s).map(|s| TextPart::Text(s.to_string()));
-
-                        let text_parts = str_it.interleave(tags_it).collect::<Vec<_>>();
-
-                        self.msgs[bank_id][idx].text[lang_idx] = text_parts;
-                    }             
-                }
-            }
-        } else  {
-            println!("NO MATCH : {}", line);
-        }
-    }
-
     fn add_message(&mut self, msg: &MessageSingleLang, lang_idx : usize, bank_id : usize) {
         let idx = msg.id - 1;
 
@@ -860,22 +728,22 @@ impl BMGParser {
     }
 }
 
-fn process_file(lines : impl Iterator<Item=std::string::String>, lang_id : usize, bank_id : usize, parser : &mut BMGParser) {
-    let iter = lines.skip_while(|l|  !RE.is_match(l) );
-    
-    for l in iter {
-        parser.feed_line(&l, lang_id, bank_id);
-    }
-}
+fn process_file(filename : &Path, lang_id : usize, bank_id : usize, parser : &mut BMGParser) -> io::Result<()> {
 
-fn process_raw_bmg(filename : &Path, lang_id : usize, bank_id : usize, parser : &mut BMGParser) {
+    println!("opening file {}", filename.display());
+    // Tried some shennaningans
+    let p : Box<dyn MessageParser> = match filename.extension().and_then(|s| s.to_str()) {
+        Some("txt") => Box::new(bmg_text_parser::open_bmg(filename)?),
+        Some("bmg") => Box::new(bmg_raw_parser::open_bmg(filename)?),
+        None => todo!(),
+        _ => todo!()
+    };
 
-    println!("opening raw bmg {}", filename.display());
-    if let Ok(raw_parser) = bmg_raw_parser::open_bmg(filename) {
-        for m in raw_parser.get_all_messages() {
-            parser.add_message(&m, lang_id, bank_id);
-        }
+    for m in p.get_all_messages() {
+        parser.add_message(&m, lang_id, bank_id);
     }
+
+    Ok(())
 }
 
 fn process_language(lang_idx : usize, lang_id : &str, parser : &mut BMGParser, use_raw : bool) {
@@ -883,19 +751,9 @@ fn process_language(lang_idx : usize, lang_id : &str, parser : &mut BMGParser, u
     let folder_path = Path::new(&str_path);
 
     for (bank_id,&basename) in FILENAMES.iter().enumerate() {
-        if use_raw {
-            let filename = basename.to_owned() + ".bmg";
-            process_raw_bmg(&folder_path.join(&filename), lang_idx, bank_id, parser);
-        } else {
-            let filename = basename.to_owned() + ".txt";
-            println!("{} {}", lang_id, filename);
-            if let Ok(file) = File::open(folder_path.join(&filename)) {
-                let buf_reader = BufReader::new(file);
-                process_file(buf_reader.lines().flatten(),lang_idx, bank_id,  parser);
-            } else {
-                println!("Couldn't open file {}" , filename);
-            }
-        }
+        
+        let filename = basename.to_owned() + if use_raw {".bmg"} else {".txt"};
+        let _ = process_file(&folder_path.join(&filename), lang_idx, bank_id, parser);
     }
 }
 

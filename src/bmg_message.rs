@@ -2,7 +2,7 @@ use std::fmt;
 
 use itertools::Itertools;
 
-use crate::utils::{get_u16, get_u32};
+use crate::utils::{get_u16};
 
 pub const LANGUAGES_COUNT : usize = 4;
 
@@ -44,7 +44,7 @@ pub struct Message {
     pub id : usize
 }
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct MessageSingleLang {
     pub text : MessageText,
     pub attribs : MessageAttributes,
@@ -58,8 +58,33 @@ impl Message {
     }
 }
 
+impl fmt::Display for Message {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f,"{:?}", self.text.iter().map(|text_parts| {
+            text_parts.iter().map(|part|
+                part.to_string() ).join("")
+        }).collect::<Vec<_>>())
+    }
+}
 
-pub fn get_raw_msg(msg : MessageText) -> String {
+impl fmt::Debug for Message {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}",self.text.iter().map(|lang_msg| 
+            lang_msg.iter().map(|part| format!("{:?}", part)).collect::<Vec<_>>().join("\n")
+            ).join("\n ------------------\n")   
+        )
+    }
+}
+
+impl Default for Message {
+    fn default() -> Self {
+        Message { text: Default::default(), attribs: MessageAttributes::default(), id : 0}
+    }
+}
+
+
+
+pub fn get_raw_msg(msg : &MessageText) -> String {
     msg.iter().map(|text_part| match text_part {
             TextPart::Text(s) => s.to_string(),
             TextPart::Tag(t) => t.get_simple_replacement().to_string()
@@ -111,4 +136,18 @@ impl From<&Vec<u8>> for Tag {
             Tag::default()
         }
     }
+}
+
+
+impl fmt::Debug for Tag {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f,"{:0>2X}/{:0>4X} payload : {:X?}", self.group, self.number, self.payload)
+    }
+}
+
+
+
+
+pub trait MessageParser {
+    fn get_all_messages(&self) -> Vec<MessageSingleLang>;
 }
