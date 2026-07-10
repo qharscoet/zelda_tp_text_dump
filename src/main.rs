@@ -11,6 +11,186 @@ use utils::{get_u16};
 
 use crate::bmg_message::{MessageParser, MessageSingleLang};
 
+
+trait GameConfig {
+    //Fonts
+    //Tag Replacement fn
+
+    fn get_color_hex(id : usize) -> &'static str;
+    fn get_tag_replacement(tag : &Tag) -> &str;
+}
+
+struct TWWConfig;
+struct TPConfig;
+
+impl GameConfig for TWWConfig {
+    fn get_color_hex(id : usize) -> &'static str {
+        const COLORS_RGB_TWW : [&str; 9] = [
+            "#ffffffff",
+            "#ff6400ff",
+            "#00ff00ff",
+            "#7878ffff",
+            "#ffff3cff",
+            "#00ffffff",
+            "#ff00ffff",
+            "#828282ff",
+            "#ff8000ff",
+        ];
+    
+        COLORS_RGB_TWW[id]
+    }    
+
+    fn get_tag_replacement(tag : &Tag) -> &str {
+        return "[TWW_Tag]"
+    }
+}
+
+
+
+impl GameConfig for TPConfig {
+    fn get_color_hex(id : usize) -> &'static str {
+        const COLORS_RGB : [&str; 9] = [
+            "#FFFFFF",
+            "#f07878",
+            "#aadc8c",
+            "#a0b4dc",
+            "#dcdc82",
+            "#b4c8e6",
+            "#c8a0dc",
+            "#ffffff",
+            "#dcaa78",
+        ];
+
+        COLORS_RGB[id]
+    }
+
+
+    fn get_tag_replacement(tag : &Tag) -> &str {
+        match tag.group {
+            0x00 => {
+                match tag.number {
+                    0x08 => "• ",
+                    0x09 => "• ",
+                    0x0A => "[A] ",
+                    0x0B => "[B] ",
+                    0x0C => "[C] ",
+                    0x0D => "[L] ",
+                    0x0E => "[R] ",
+                    0x0F => "[X] ",
+                    0x10 => "[Y] ",
+                    0x11 => "[Z] ",
+                    0x12 => "[DPad] ",
+                    0x13 => "[Analog] ",
+                    0x14 => "🡄 ",
+                    0x15 => "🡆 ",
+                    0x16 => "🡅 ",
+                    0x17 => "🡇 ",
+                    0x18 => "[AnalogUp] ",
+                    0x19 => "[AnalogDown] ",
+                    0x1A => "[AnalogLeft] ",
+                    0x1B => "[AnalogRight] ",
+                    0x1C => "[AnalogVertical] ",
+                    0x1D => "[AnalogHorizontal] ",
+                    0x23 => "[RedTarget] ",
+                    0x24 => "[YellowTarget] ",
+                    0x2E => "[XorY] ",
+                    0x39 => "♥ ",
+                    0x00 =>	"[Link]",
+                    0x22 =>	"[Epona]",
+                    0x29 =>	"[CurrentScent]",
+                    0x2B =>	"[WarpingTo]",
+                    0x2D =>	"[Bomb-Name]",
+                    0x31 =>	"[Bomb-Count]",
+                    0x32 =>	"[Bomb-Price]",
+                    0x35 =>	"[nop000035]",
+                    0x37 =>	"[Bombcap]",
+                    0x3B =>	"[ReturnedBug]",
+                    0x3C =>	"[LetterSender]",
+                    0x3E =>	"[CurrentLetterPage]",
+                    0x3F =>	"[MaxLetterPage]",
+                    _ => ""
+                }
+            },
+            0x03 => {
+                match tag.number {
+                    0x01 =>	"[WiiA]",
+                    0x02 =>	"[WiiB]",
+                    0x03 =>	"[WiiHome]",
+                    0x04 =>	"[WiiMinus]",
+                    0x05 =>	"[WiiPlus]",
+                    0x06 =>	"[Wii1]",
+                    0x07 =>	"[Wii2]",
+                    0x08 =>	"[WiiD-WE]",
+                    0x09 =>	"[WiiD-N]",
+                    0x0A =>	"[WiiD-S]",
+                    0x0B =>	"[WiiD-WE]",
+                    0x0C =>	"[WiiD-E]",
+                    0x0D =>	"[WiiD-W]",
+                    0x0E =>	"[Wiimote]",
+                    0x0F =>	"[WReticule]",
+                    0x10 =>	"[WNunchunk]",
+                    0x11 =>	"[Wiimote]",
+                    0x12 =>	"[Fairy]",
+                    0x13 =>	"[WiiC]",
+                    0x14 =>	"[WiiZ]",
+                    _ => ""
+                }
+            },
+            0x04 => {
+                match tag.number {
+                    0x00 =>	"巫",
+                    0x01 =>	"嗅",
+                    0x02 =>	"眷",
+                    0x03 =>	"蜀",
+                    0x04 =>	"蟲",
+                    0x05 =>	"裔",
+                    0x06 =>	"惧",
+                    0x07 =>	"綺",
+                    0x08 =>	"罠",
+                    0x09 =>	"祓",
+                    0x0A =>	"墟",
+                    0x0B =>	"絆",
+                    0x0C =>	"僭",
+                    0x0D =>	"憑",
+                    _ => ""
+                }
+            },
+            0x05 => {
+                match tag.number {
+                    0x00 =>	"[Time]",
+                    0x03 =>	if tag.payload[0] == 0  {"[ReturnedBugs]" } else {"[RemainingBugs]"},
+                    0x04 =>	"noop",
+                    0x07 =>	"[RiverPoints]",
+                    0x08 =>	"[FishLength]",
+                    0x09 =>	"[MartGoalLef]",
+                    0x0A =>	"[LetterCount]",
+                    0x0B =>	"[PoesNeeded]",
+                    0x0C =>	if tag.payload[0] == 0 {"[LatestScore]" } else {"[HighScore]"},
+                    0x0D =>	"[FishCount]",
+                    0x0E =>	"[RollGoal]",
+                    _ => ""
+                }
+            },
+            0x06 => {
+                match tag.number {
+                    0x02 => "♂",	
+                    0x03 => "♀",	
+                    0x04 => "★",	
+                    0x05 => "※",	
+                    0x06 => "←",	
+                    0x07 => "→",	
+                    0x08 => "↑",	
+                    0x09 => "↓",	
+                    0x0A => "⧫",
+                    0x0B => " ",    
+                    _ => "",
+                }
+            },
+            _=> "",
+        }
+    }
+}
+
 const BANK_COUNT : usize = 10;
 const FILENAMES : [&str;BANK_COUNT] = [
     "zel_00",
@@ -395,7 +575,7 @@ impl Exporter for HTMLExporter  {
 <html>
 <head>
 <style>
-@font-face {
+    @font-face {
         font-family: 'fot-rodin_prondb';
         src: url(\"assets/FOT-RodinProN-DB.otf\");
         font-weight: normal;
@@ -664,7 +844,11 @@ impl Exporter for XLSXExporter {
 impl BMGParser {
     fn add_message(&mut self, msg: &MessageSingleLang, lang_idx : usize, bank_id : usize) {
 
-        let idx = if msg.id > 0 {msg.id - 1} else {self.msgs[bank_id].len()};
+        if msg.is_empty() {
+            return;
+        }
+
+        let idx = msg.id - 1;//if msg.id > 0 {} else {self.msgs[bank_id].len()};
 
         if idx + 1> self.msgs[bank_id].len() { self.msgs[bank_id].resize_with(idx + 1, || Message::default() );}
 
@@ -766,18 +950,16 @@ fn main() {
         process_language(lang_idx,lang, &mut parser, true);
     }
 
-    parser.export_html(Path::new("index.html"), false);
-    parser.export_csv(Path::new("textdump.csv"));
-    parser.export_xlsx(Path::new("textdump.xlsx"), false);
+    // parser.export_html(Path::new("index.html"), false);
+    // parser.export_csv(Path::new("textdump.csv"));
+    // parser.export_xlsx(Path::new("textdump.xlsx"), false);
 
 
+    let mut tww_parser = BMGParser::default();
+    let _ = process_file(Path::new("./res/TWW/zel_00.bmg"), 0, 0, &mut tww_parser);
 
-
-    // let mut tww_parser = BMGParser::default();
-    // let _ = process_file(Path::new("./res/TWW/zel_00.bmg"), 0, 0, &mut tww_parser);
-
-    // tww_parser.export_csv(Path::new("tww.csv"));
-    // tww_parser.export_html(Path::new("tww.html"), false);
+    tww_parser.export_csv(Path::new("tww.csv"));
+    tww_parser.export_html(Path::new("tww.html"), false);
     //bmg_raw_parser::print_bmg(Path::new("./res/TWW/zel_00.bmg"));
 
 }

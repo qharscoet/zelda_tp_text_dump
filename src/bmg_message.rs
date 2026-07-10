@@ -13,7 +13,7 @@ pub struct MessageAttributes {
 
 
 impl MessageAttributes {
-    fn _get_message_id(&self) -> u16 {
+    pub fn get_message_id(&self) -> u16 {
         get_u16(&self.payload, 0)
     }
 
@@ -55,6 +55,12 @@ pub struct MessageSingleLang {
 impl Message {
     pub fn is_empty(&self) -> bool {
         self.text.iter().all(|parts| parts.is_empty())
+    }
+}
+
+impl MessageSingleLang {
+    pub fn is_empty(&self) -> bool {
+        self.text.is_empty() && self.attribs.is_empty()
     }
 }
 

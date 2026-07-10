@@ -398,15 +398,19 @@ impl BMGRawParser {
                 let inf1_entry = &inf1.entries[idx];
                 let data = dat1.get_msg_at(inf1_entry.offset as usize, self.data_parsed.header.encoding);
 
+                
+                //let attribs = .clone();
+                let attribs = MessageAttributes{payload : inf1_entry.attributes.clone()};
+
                 let id = if let Some(BMGSectionData::MID1(mid1)) = self.get_section(BMGData::MID1) {
                     mid1.ids[idx]
-                } else { 0 } as usize;
-
-                let attribs = &inf1_entry.attributes;
+                } else { 
+                    attribs.get_message_id() as u32
+                 } as usize;
 
                 MessageSingleLang {
                     id : id,
-                    attribs : MessageAttributes{payload : attribs.clone()},
+                    attribs : attribs,
                     text : data
                 }
             } else {
