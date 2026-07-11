@@ -428,7 +428,7 @@ impl BMGRawParser {
             match &flw1.nodes[flow_node_idx] {
                 FLW1Node::Continuation { id : _, doorquery : _, inf1_idx, next_node, _pad } =>  {
                     let m = self.get_msg(*inf1_idx as usize);
-                    println!("INF1 {:X} : {}",inf1_idx,  bmg_message::get_raw_msg(&m.text));
+                    println!("INF1 {:X} : {}",inf1_idx,  bmg_message::get_raw_msg(&m.text, None));
     
                     if *next_node != 0xFFFF {
                         self.print_flow_chain(*next_node as usize, visited);

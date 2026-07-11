@@ -2,7 +2,7 @@ use std::fmt;
 
 use itertools::Itertools;
 
-use crate::utils::{get_u16};
+use crate::{game_configs::GameConfig, utils::get_u16};
 
 pub const LANGUAGES_COUNT : usize = 4;
 
@@ -39,7 +39,7 @@ impl fmt::Display for MessageAttributes {
 
 pub type MessageText = Vec<TextPart>;
 pub struct Message {
-    pub text : [MessageText; LANGUAGES_COUNT],
+    pub text : Vec<MessageText>,
     pub attribs : MessageAttributes,
     pub id : usize
 }
@@ -90,10 +90,10 @@ impl Default for Message {
 
 
 
-pub fn get_raw_msg(msg : &MessageText) -> String {
+pub fn get_raw_msg(msg : &MessageText, config : Option<&GameConfig>) -> String {
     msg.iter().map(|text_part| match text_part {
             TextPart::Text(s) => s.to_string(),
-            TextPart::Tag(t) => t.get_simple_replacement().to_string()
+            TextPart::Tag(t) => t.get_simple_replacement(config).to_string()
         }).join("")
 }
 

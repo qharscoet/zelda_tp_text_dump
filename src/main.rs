@@ -5,191 +5,13 @@ mod bmg_raw_parser;
 mod bmg_text_parser;
 mod bmg_message;
 mod utils;
+mod game_configs;
 
 use bmg_message::{Message, Tag, TextPart, LANGUAGES_COUNT};
 use utils::{get_u16};
 
-use crate::bmg_message::{MessageParser, MessageSingleLang};
+use crate::{bmg_message::{MessageParser, MessageSingleLang, get_raw_msg}, game_configs::GameConfig};
 
-
-trait GameConfig {
-    //Fonts
-    //Tag Replacement fn
-
-    fn get_color_hex(id : usize) -> &'static str;
-    fn get_tag_replacement(tag : &Tag) -> &str;
-}
-
-struct TWWConfig;
-struct TPConfig;
-
-impl GameConfig for TWWConfig {
-    fn get_color_hex(id : usize) -> &'static str {
-        const COLORS_RGB_TWW : [&str; 9] = [
-            "#ffffffff",
-            "#ff6400ff",
-            "#00ff00ff",
-            "#7878ffff",
-            "#ffff3cff",
-            "#00ffffff",
-            "#ff00ffff",
-            "#828282ff",
-            "#ff8000ff",
-        ];
-    
-        COLORS_RGB_TWW[id]
-    }    
-
-    fn get_tag_replacement(tag : &Tag) -> &str {
-        return "[TWW_Tag]"
-    }
-}
-
-
-
-impl GameConfig for TPConfig {
-    fn get_color_hex(id : usize) -> &'static str {
-        const COLORS_RGB : [&str; 9] = [
-            "#FFFFFF",
-            "#f07878",
-            "#aadc8c",
-            "#a0b4dc",
-            "#dcdc82",
-            "#b4c8e6",
-            "#c8a0dc",
-            "#ffffff",
-            "#dcaa78",
-        ];
-
-        COLORS_RGB[id]
-    }
-
-
-    fn get_tag_replacement(tag : &Tag) -> &str {
-        match tag.group {
-            0x00 => {
-                match tag.number {
-                    0x08 => "• ",
-                    0x09 => "• ",
-                    0x0A => "[A] ",
-                    0x0B => "[B] ",
-                    0x0C => "[C] ",
-                    0x0D => "[L] ",
-                    0x0E => "[R] ",
-                    0x0F => "[X] ",
-                    0x10 => "[Y] ",
-                    0x11 => "[Z] ",
-                    0x12 => "[DPad] ",
-                    0x13 => "[Analog] ",
-                    0x14 => "🡄 ",
-                    0x15 => "🡆 ",
-                    0x16 => "🡅 ",
-                    0x17 => "🡇 ",
-                    0x18 => "[AnalogUp] ",
-                    0x19 => "[AnalogDown] ",
-                    0x1A => "[AnalogLeft] ",
-                    0x1B => "[AnalogRight] ",
-                    0x1C => "[AnalogVertical] ",
-                    0x1D => "[AnalogHorizontal] ",
-                    0x23 => "[RedTarget] ",
-                    0x24 => "[YellowTarget] ",
-                    0x2E => "[XorY] ",
-                    0x39 => "♥ ",
-                    0x00 =>	"[Link]",
-                    0x22 =>	"[Epona]",
-                    0x29 =>	"[CurrentScent]",
-                    0x2B =>	"[WarpingTo]",
-                    0x2D =>	"[Bomb-Name]",
-                    0x31 =>	"[Bomb-Count]",
-                    0x32 =>	"[Bomb-Price]",
-                    0x35 =>	"[nop000035]",
-                    0x37 =>	"[Bombcap]",
-                    0x3B =>	"[ReturnedBug]",
-                    0x3C =>	"[LetterSender]",
-                    0x3E =>	"[CurrentLetterPage]",
-                    0x3F =>	"[MaxLetterPage]",
-                    _ => ""
-                }
-            },
-            0x03 => {
-                match tag.number {
-                    0x01 =>	"[WiiA]",
-                    0x02 =>	"[WiiB]",
-                    0x03 =>	"[WiiHome]",
-                    0x04 =>	"[WiiMinus]",
-                    0x05 =>	"[WiiPlus]",
-                    0x06 =>	"[Wii1]",
-                    0x07 =>	"[Wii2]",
-                    0x08 =>	"[WiiD-WE]",
-                    0x09 =>	"[WiiD-N]",
-                    0x0A =>	"[WiiD-S]",
-                    0x0B =>	"[WiiD-WE]",
-                    0x0C =>	"[WiiD-E]",
-                    0x0D =>	"[WiiD-W]",
-                    0x0E =>	"[Wiimote]",
-                    0x0F =>	"[WReticule]",
-                    0x10 =>	"[WNunchunk]",
-                    0x11 =>	"[Wiimote]",
-                    0x12 =>	"[Fairy]",
-                    0x13 =>	"[WiiC]",
-                    0x14 =>	"[WiiZ]",
-                    _ => ""
-                }
-            },
-            0x04 => {
-                match tag.number {
-                    0x00 =>	"巫",
-                    0x01 =>	"嗅",
-                    0x02 =>	"眷",
-                    0x03 =>	"蜀",
-                    0x04 =>	"蟲",
-                    0x05 =>	"裔",
-                    0x06 =>	"惧",
-                    0x07 =>	"綺",
-                    0x08 =>	"罠",
-                    0x09 =>	"祓",
-                    0x0A =>	"墟",
-                    0x0B =>	"絆",
-                    0x0C =>	"僭",
-                    0x0D =>	"憑",
-                    _ => ""
-                }
-            },
-            0x05 => {
-                match tag.number {
-                    0x00 =>	"[Time]",
-                    0x03 =>	if tag.payload[0] == 0  {"[ReturnedBugs]" } else {"[RemainingBugs]"},
-                    0x04 =>	"noop",
-                    0x07 =>	"[RiverPoints]",
-                    0x08 =>	"[FishLength]",
-                    0x09 =>	"[MartGoalLef]",
-                    0x0A =>	"[LetterCount]",
-                    0x0B =>	"[PoesNeeded]",
-                    0x0C =>	if tag.payload[0] == 0 {"[LatestScore]" } else {"[HighScore]"},
-                    0x0D =>	"[FishCount]",
-                    0x0E =>	"[RollGoal]",
-                    _ => ""
-                }
-            },
-            0x06 => {
-                match tag.number {
-                    0x02 => "♂",	
-                    0x03 => "♀",	
-                    0x04 => "★",	
-                    0x05 => "※",	
-                    0x06 => "←",	
-                    0x07 => "→",	
-                    0x08 => "↑",	
-                    0x09 => "↓",	
-                    0x0A => "⧫",
-                    0x0B => " ",    
-                    _ => "",
-                }
-            },
-            _=> "",
-        }
-    }
-}
 
 const BANK_COUNT : usize = 10;
 const FILENAMES : [&str;BANK_COUNT] = [
@@ -206,24 +28,12 @@ const FILENAMES : [&str;BANK_COUNT] = [
 ];
 
 
-const LANGUAGES : [&str;LANGUAGES_COUNT] = [
-    "jp",
-    "us",
-    "fr",
-    // "sp",
-    "de",
-    // "it"
-];
-
-const LANGUAGES_FULL : [&str;LANGUAGES_COUNT] = [
-    "Japanese",
-    "US English",
-    "French",
-    // "Spanish",
-    "German",
-    // "Italian"
-];
-
+// const LANGUAGES : [(&str, &str);LANGUAGES_COUNT] = [
+//     ("jp", "Japanese"),
+//     ("us", "US English"),
+//     ("fr", "French"),
+//     ("de", "German"),
+// ];
 
 
 const COLORS_RGB : [&str; 9] = [
@@ -241,128 +51,10 @@ const COLORS_RGB : [&str; 9] = [
 
 impl Tag {
     
-    fn get_simple_replacement(&self) -> &str {
-        match self.group {
-            0x00 => {
-                match self.number {
-                    0x08 => "• ",
-                    0x09 => "• ",
-                    0x0A => "[A] ",
-                    0x0B => "[B] ",
-                    0x0C => "[C] ",
-                    0x0D => "[L] ",
-                    0x0E => "[R] ",
-                    0x0F => "[X] ",
-                    0x10 => "[Y] ",
-                    0x11 => "[Z] ",
-                    0x12 => "[DPad] ",
-                    0x13 => "[Analog] ",
-                    0x14 => "🡄 ",
-                    0x15 => "🡆 ",
-                    0x16 => "🡅 ",
-                    0x17 => "🡇 ",
-                    0x18 => "[AnalogUp] ",
-                    0x19 => "[AnalogDown] ",
-                    0x1A => "[AnalogLeft] ",
-                    0x1B => "[AnalogRight] ",
-                    0x1C => "[AnalogVertical] ",
-                    0x1D => "[AnalogHorizontal] ",
-                    0x23 => "[RedTarget] ",
-                    0x24 => "[YellowTarget] ",
-                    0x2E => "[XorY] ",
-                    0x39 => "♥ ",
-                    0x00 =>	"[Link]",
-                    0x22 =>	"[Epona]",
-                    0x29 =>	"[CurrentScent]",
-                    0x2B =>	"[WarpingTo]",
-                    0x2D =>	"[Bomb-Name]",
-                    0x31 =>	"[Bomb-Count]",
-                    0x32 =>	"[Bomb-Price]",
-                    0x35 =>	"[nop000035]",
-                    0x37 =>	"[Bombcap]",
-                    0x3B =>	"[ReturnedBug]",
-                    0x3C =>	"[LetterSender]",
-                    0x3E =>	"[CurrentLetterPage]",
-                    0x3F =>	"[MaxLetterPage]",
-                    _ => ""
-                }
-            },
-            0x03 => {
-                match self.number {
-                    0x01 =>	"[WiiA]",
-                    0x02 =>	"[WiiB]",
-                    0x03 =>	"[WiiHome]",
-                    0x04 =>	"[WiiMinus]",
-                    0x05 =>	"[WiiPlus]",
-                    0x06 =>	"[Wii1]",
-                    0x07 =>	"[Wii2]",
-                    0x08 =>	"[WiiD-WE]",
-                    0x09 =>	"[WiiD-N]",
-                    0x0A =>	"[WiiD-S]",
-                    0x0B =>	"[WiiD-WE]",
-                    0x0C =>	"[WiiD-E]",
-                    0x0D =>	"[WiiD-W]",
-                    0x0E =>	"[Wiimote]",
-                    0x0F =>	"[WReticule]",
-                    0x10 =>	"[WNunchunk]",
-                    0x11 =>	"[Wiimote]",
-                    0x12 =>	"[Fairy]",
-                    0x13 =>	"[WiiC]",
-                    0x14 =>	"[WiiZ]",
-                    _ => ""
-                }
-            },
-            0x04 => {
-                match self.number {
-                    0x00 =>	"巫",
-                    0x01 =>	"嗅",
-                    0x02 =>	"眷",
-                    0x03 =>	"蜀",
-                    0x04 =>	"蟲",
-                    0x05 =>	"裔",
-                    0x06 =>	"惧",
-                    0x07 =>	"綺",
-                    0x08 =>	"罠",
-                    0x09 =>	"祓",
-                    0x0A =>	"墟",
-                    0x0B =>	"絆",
-                    0x0C =>	"僭",
-                    0x0D =>	"憑",
-                    _ => ""
-                }
-            },
-            0x05 => {
-                match self.number {
-                    0x00 =>	"[Time]",
-                    0x03 =>	if self.payload[0] == 0  {"[ReturnedBugs]" } else {"[RemainingBugs]"},
-                    0x04 =>	"noop",
-                    0x07 =>	"[RiverPoints]",
-                    0x08 =>	"[FishLength]",
-                    0x09 =>	"[MartGoalLef]",
-                    0x0A =>	"[LetterCount]",
-                    0x0B =>	"[PoesNeeded]",
-                    0x0C =>	if self.payload[0] == 0 {"[LatestScore]" } else {"[HighScore]"},
-                    0x0D =>	"[FishCount]",
-                    0x0E =>	"[RollGoal]",
-                    _ => ""
-                }
-            },
-            0x06 => {
-                match self.number {
-                    0x02 => "♂",	
-                    0x03 => "♀",	
-                    0x04 => "★",	
-                    0x05 => "※",	
-                    0x06 => "←",	
-                    0x07 => "→",	
-                    0x08 => "↑",	
-                    0x09 => "↓",	
-                    0x0A => "⧫",
-                    0x0B => " ",    
-                    _ => "",
-                }
-            },
-            _=> "",
+    fn get_simple_replacement(&self, config: Option<&GameConfig>) -> &str {
+        match config {
+            Some(conf) => (conf.get_tag_replacement)(&self),
+            None => "[Tag]"
         }
     }
 }
@@ -378,16 +70,16 @@ impl fmt::Display for Tag {
                     _ => "",
                 }
             },
-            _ => self.get_simple_replacement()
+            _ => self.get_simple_replacement(None)
         })
     }
 }
 
 impl Message {
-    fn get_html_formatted(&self, lang_id : usize, ignore_tags : bool) -> String {
+    fn get_html_formatted(&self, lang_id : usize, ignore_tags : bool, config : Option<&GameConfig>) -> String {
         
         if ignore_tags {
-            self.get_raw(lang_id).replace("\n", "<br>")
+            self.get_raw(lang_id, config).replace("\n", "<br>")
             //RE_TAG.replace_all(&s, |c : &Captures| c[0].parse::<Tag>().unwrap_or_default().get_simple_replacement().to_owned()).to_string()
         } else {
 
@@ -398,62 +90,65 @@ impl Message {
 
             let mut needs_ruby : Option<(u8, String)> = None;
 
-            for part in &self.text[lang_id] {
-                match part {
-                    TextPart::Text(text) => {
-                        if text != "" {
-                            let text = text.replace("\n", "<br>");
-                            if let Some((over_count, ruby_text)) = needs_ruby {
-                                let mut chars = text.chars();
-                                let base_text : String = chars.by_ref().take(over_count as usize).collect();
-                                let remaining_text : String = chars.collect();
-                                res_str += &format!("<ruby>{}<rp>(</rp><rt>{}</rt><rp>)</rp></ruby>{}", base_text, ruby_text, remaining_text);
-                                needs_ruby = None;
-                            } else {
-                                res_str += &text;
-                            }
-                        }
-                    },
-                    TextPart::Tag(tag) => {
-                        match tag.group {
-                            0xFF => {
-                                match tag.number {
-                                    0x00 => { // change color
-                                        let new_color = tag.payload[0] as usize;
-                                        if current_color != 0 {
-                                            res_str += "</span>";
-                                        }
-                                        if new_color != 0 {
-                                            res_str += &format!("<span style='color:{};'>", COLORS_RGB[new_color]);
-                                        }
-                                        current_color = new_color;
-                                    },
-                                    0x01 => {
-
-                                        let new_size = get_u16(&tag.payload, 0);
-                                        if current_size != 100 {
-                                            res_str += "</span>"
-                                        }
-                                        if new_size != 100 {
-                                            res_str += &format!("<span style='font-size:{}%;'>", new_size);
-                                        }
-                
-                                        current_size = new_size;
-                                    },
-                                    0x02 => {
-                                        let over_count = tag.payload[0];
-                                        let raw_shiftjs : Vec<_>= tag.payload[1..].iter().map(|v| *v).collect();
-                                        let decoded_ruby = encoding_rs::SHIFT_JIS.decode(&raw_shiftjs).0;
-                                        needs_ruby = Some((over_count, decoded_ruby.to_string()));
-                                        //println!("{}", decoded_ruby);
-                                    },
-                                    _ => {}
+            if self.text.len() > lang_id {
+                for part in &self.text[lang_id] {
+                    match part {
+                        TextPart::Text(text) => {
+                            if text != "" {
+                                let text = text.replace("\n", "<br>");
+                                if let Some((over_count, ruby_text)) = needs_ruby {
+                                    let mut chars = text.chars();
+                                    let base_text : String = chars.by_ref().take(over_count as usize).collect();
+                                    let remaining_text : String = chars.collect();
+                                    res_str += &format!("<ruby>{}<rp>(</rp><rt>{}</rt><rp>)</rp></ruby>{}", base_text, ruby_text, remaining_text);
+                                    needs_ruby = None;
+                                } else {
+                                    res_str += &text;
                                 }
                             }
-                            _ => { res_str += tag.get_simple_replacement(); }
+                        },
+                        TextPart::Tag(tag) => {
+                            match tag.group {
+                                0xFF => {
+                                    match tag.number {
+                                        0x00 => { // change color
+                                            let new_color = tag.payload[0] as usize;
+                                            if current_color != 0 {
+                                                res_str += "</span>";
+                                            }
+                                            if new_color != 0 {
+                                                let c = if let Some(conf) = config { (conf.get_color_hex)(new_color)} else { COLORS_RGB[new_color]};
+                                                res_str += &format!("<span style='color:{};'>", c);
+                                            }
+                                            current_color = new_color;
+                                        },
+                                        0x01 => {
+    
+                                            let new_size = get_u16(&tag.payload, 0);
+                                            if current_size != 100 {
+                                                res_str += "</span>"
+                                            }
+                                            if new_size != 100 {
+                                                res_str += &format!("<span style='font-size:{}%;'>", new_size);
+                                            }
+                    
+                                            current_size = new_size;
+                                        },
+                                        0x02 => {
+                                            let over_count = tag.payload[0];
+                                            let raw_shiftjs : Vec<_>= tag.payload[1..].iter().map(|v| *v).collect();
+                                            let decoded_ruby = encoding_rs::SHIFT_JIS.decode(&raw_shiftjs).0;
+                                            needs_ruby = Some((over_count, decoded_ruby.to_string()));
+                                            //println!("{}", decoded_ruby);
+                                        },
+                                        _ => {}
+                                    }
+                                }
+                                _ => { res_str += tag.get_simple_replacement(config); }
+                            }
                         }
-                    }
-                }                
+                    }                
+                }
             }
 
             res_str
@@ -461,11 +156,11 @@ impl Message {
         
     }
 
-    fn get_xlsx_formatted(&self, lang_id : usize, ignore_tags : bool, default_color : Color ) -> Vec<(Format, String)> {
+    fn get_xlsx_formatted(&self, lang_id : usize, ignore_tags : bool, default_color : Color, config : Option<&GameConfig> ) -> Vec<(Format, String)> {
         let mut segments : Vec<(Format, String)> = Vec::new();
 
         if ignore_tags {
-            segments.push((Format::new(), self.get_raw(lang_id)));
+            segments.push((Format::new(), self.get_raw(lang_id, config)));
         } else {
             
             let mut current_color = 0;
@@ -473,49 +168,52 @@ impl Message {
 
             const DEFAULT_SIZE : f32 = 11.0;
 
+            if self.text.len() > lang_id {
 
-            for part in &self.text[lang_id] {
-                match part {
-                    TextPart::Text(text) => {
-                        if !text.is_empty() {
-                            let color = if current_color == 0 { default_color } else { Color::from(COLORS_RGB[current_color])};
-                            let size = DEFAULT_SIZE * (current_size as f32/100.0);
-                            let format = Format::new().set_font_color(color).set_font_size(size);
-                            segments.push((format, text.to_string()));
-                        }
-                    },
-                    TextPart::Tag(tag) => {
-                        match tag.group {
-                            0xFF => {
-                                match tag.number {
-                                    0x00 => { // change color
-                                        //color
-
-                                        current_color = tag.payload[0] as usize;
-                                    },
-                                    0x01 => {
-
-                                        current_size = get_u16(&tag.payload, 0);
-                                        //Size
-                                    },
-                                    0x02 => {
-                                        //ruby
-                                    },
-                                    _ => {}
+                for part in &self.text[lang_id] {
+                    match part {
+                        TextPart::Text(text) => {
+                            if !text.is_empty() {
+                                let config_color = if let Some(conf) = config { (conf.get_color_hex)(current_color)} else { COLORS_RGB[current_color]};
+                                let color = if current_color == 0 { default_color } else { Color::from(config_color)};
+                                let size = DEFAULT_SIZE * (current_size as f32/100.0);
+                                let format = Format::new().set_font_color(color).set_font_size(size);
+                                segments.push((format, text.to_string()));
+                            }
+                        },
+                        TextPart::Tag(tag) => {
+                            match tag.group {
+                                0xFF => {
+                                    match tag.number {
+                                        0x00 => { // change color
+                                            //color
+    
+                                            current_color = tag.payload[0] as usize;
+                                        },
+                                        0x01 => {
+    
+                                            current_size = get_u16(&tag.payload, 0);
+                                            //Size
+                                        },
+                                        0x02 => {
+                                            //ruby
+                                        },
+                                        _ => {}
+                                    }
+                                }
+                                _ => { 
+                                    let s = tag.get_simple_replacement(config).to_string();
+                                    if !s.is_empty() {
+                                        let color = if current_color == 0 { default_color } else { Color::from(COLORS_RGB[current_color])};
+                                        let size = DEFAULT_SIZE * (current_size as f32/100.0);
+                                        let format = Format::new().set_font_color(color).set_font_size(size);
+    
+                                        segments.push((format, s)); 
+                                    }
                                 }
                             }
-                            _ => { 
-                                let s = tag.get_simple_replacement().to_string();
-                                if !s.is_empty() {
-                                    let color = if current_color == 0 { default_color } else { Color::from(COLORS_RGB[current_color])};
-                                    let size = DEFAULT_SIZE * (current_size as f32/100.0);
-                                    let format = Format::new().set_font_color(color).set_font_size(size);
-
-                                    segments.push((format, s)); 
-                                }
-                            }
-                        }
-                    },
+                        },
+                    }
                 }
             }
         }
@@ -523,8 +221,12 @@ impl Message {
         segments
     }
 
-    fn get_raw(&self, lang_id : usize) -> String {
-        bmg_message::get_raw_msg(&self.text[lang_id])
+    fn get_raw(&self, lang_id : usize, config : Option<&GameConfig>) -> String {
+        if self.text.len() > lang_id {
+            bmg_message::get_raw_msg(&self.text[lang_id], config)
+        } else {
+            String::new()
+        }
     }
 
 }
@@ -549,6 +251,7 @@ impl BMGParser {
 
 trait Exporter {
     fn new(filepath: &Path) -> Self;
+    fn set_config(&mut self, config:&GameConfig);
     fn begin(&mut self);
     fn set_headers(&mut self);
     fn add_row(&mut self , msg : &Message, ignore_tags : bool);
@@ -556,72 +259,107 @@ trait Exporter {
 }
 
 struct HTMLExporter {
-    file: Option<File>
+    file: Option<File>,
+    config : Option<GameConfig>
 }
 
 impl Exporter for HTMLExporter  {
     fn new(filepath: &Path) -> Self {
         if let Ok(f) = File::create(filepath) {
-            HTMLExporter { file: Some(f) }
+            HTMLExporter { file: Some(f), config :None }
         } else {
             println!("Can't open {}", filepath.display());
-            HTMLExporter {file: None}
+            HTMLExporter {file: None, config : None}
         }
     }
-    
+
+    fn set_config(&mut self, config : &GameConfig) {
+        self.config = Some(config.clone());
+    }
+
     fn begin(&mut self) {
         if let Some(f) = &mut self.file {
-            let _ = f.write("<!DOCTYPE html>
+
+        let font =  match &self.config {
+            Some(conf) => match conf.id {
+                "tp" => "fot-rodin-prondb",
+                "tww" => "rock",
+                _ => "fot-rodin-prondb"
+            }
+            None => "fot-rodin-prondb"
+            
+        };
+
+        let ruby_font =  match &self.config {
+            Some(conf) => match conf.id {
+                "tp" => "reishotai",
+                "tww" => "fot-rodin_prondb",
+                _ => "fot-rodin-prondb"
+            }
+            None => "fot-rodin-prondb"
+            
+        };
+        let _ = f.write(format!("<!DOCTYPE html>
 <html>
 <head>
 <style>
-    @font-face {
+    @font-face {{
         font-family: 'fot-rodin_prondb';
         src: url(\"assets/FOT-RodinProN-DB.otf\");
         font-weight: normal;
         font-style: normal;
-    }
+    }}
 
-    @font-face {
+    @font-face {{
         font-family: 'reishotai';
         src: url(\"assets/Reishotai.otf\");
         font-weight: normal;
         font-style: normal;
         size-adjust: 120%;
-    }
+    }}
 
-    body rt {
+    @font-face {{
+        font-family: 'rock';
+        src: url(\"assets/RocknRollOne-Regular.ttf\");
+        font-weight: 400;
+        font-style: normal;
+    }}
+
+    body rt {{
         color : white;
-        font-family: 'reishotai', 'ＭＳ 明朝', serif;
-    }
+        font-family: '{ruby_font}', 'ＭＳ 明朝', serif;
+    }}
 
-    body.nofuri rt {
+    body.nofuri rt {{
         display:none;
-    }
+    }}
 
 
-    header {
+    header {{
             text-align:center;
-        }
+        }}
 
-  table {
+  table {{
     table-layout: fixed;
     width: 100%;
     overflow:auto;
-    font-family: 'fot-rodin_prondb';
+    font-family: '{font}';
     
-}
-td {
+}}
+td {{
     border: 1px solid white;
     background: rgb(0 0 0 / 90%);
     border-radius: 10px;
     padding:1em;
-    }
+    }}
 
-tr {
+th {{
+        color:black; 
+}}
+tr {{
     color: white;
     height: 48px;
-}
+}}
 </style>
 </head>
 <body>
@@ -632,7 +370,7 @@ tr {
     <input id=\"hide-furi\" type=\"checkbox\" name=\"HideFuri\" />
     <label for=\"HideFuri\">Hide Japanese Furigana</label>
 </div>
-<table>".as_bytes());
+<table>").as_bytes());
         }
         
     }
@@ -642,9 +380,10 @@ tr {
             let mut s = "<thead>
     <tr>".to_string();
 
-          for lang in LANGUAGES_FULL {
-              s +=  &format!("<th>{}</th>", lang);
-          }
+        let languages = if let Some(conf) = &self.config {(conf.get_languages)()} else { &[] };
+        for lang in languages {
+            s +=  &format!("<th>{}</th>", lang.1);
+        }
 
       s += "
     </tr>
@@ -669,8 +408,9 @@ tr {
             };
             let mut s  = format!("<tr {display_style}>");
     
-            for i in 0..LANGUAGES_COUNT {
-                s += &format!("<td>{}</td>\n", msg.get_html_formatted(i, ignore_tags));
+            let lang_count =  if let Some(config) = &self.config { (config.get_languages)().len()} else {0};
+            for i in 0..lang_count {
+                s += &format!("<td>{}</td>\n", msg.get_html_formatted(i, ignore_tags, self.config.as_ref()));
             }
     
             s += "</tr>";
@@ -699,18 +439,23 @@ const nofuriCheckbox = document.querySelector('#hide-furi');
 }
 
 struct CSVExporter {
-    file: Option<File>
+    file: Option<File>,
+    config : Option<GameConfig>
 }
 
 
 impl Exporter for CSVExporter {
     fn new(filepath: &Path) -> Self {
         if let Ok(f) = File::create(filepath) {
-            CSVExporter { file: Some(f) }
+            CSVExporter { file: Some(f), config : None }
         } else {
             println!("Can't open {}", filepath.display());
-            CSVExporter {file: None}
+            CSVExporter {file: None, config: None}
         }
+    }
+
+    fn set_config(&mut self, config : &GameConfig) {
+        self.config = Some(config.clone());
     }
 
     fn begin(&mut self) {
@@ -721,8 +466,9 @@ impl Exporter for CSVExporter {
         if let Some(f) = &mut self.file {
             let mut s = "".to_string();
 
-            for lang in LANGUAGES_FULL {
-                s +=  &format!("{};", lang);
+            let languages = if let Some(conf) = &self.config {(conf.get_languages)()} else { &[] };
+            for lang in languages {
+                s +=  &format!("{};", lang.1);
             }
             s += "\n";
             let _ = f.write(s.as_bytes());
@@ -734,8 +480,9 @@ impl Exporter for CSVExporter {
         if let Some(f) = &mut self.file {
             let mut s =  "".to_string();
     
-            for i in 0..LANGUAGES_COUNT {
-                s += &format!("\"{}\";", msg.get_raw(i));
+            let lang_count =  if let Some(config) = &self.config { (config.get_languages)().len()} else {0};
+            for i in 0..lang_count {
+                s += &format!("\"{}\";", msg.get_raw(i, self.config.as_ref()));
             }
 
             s += "\n";
@@ -752,13 +499,18 @@ impl Exporter for CSVExporter {
 struct XLSXExporter {
     filepath: String,
     workbook : rust_xlsxwriter::Workbook,
-    current_row: usize
+    current_row: usize,
+    config : Option<GameConfig>
 }
 
 impl Exporter for XLSXExporter {
     fn new(filepath: &Path) -> Self {
         println!("Creating XLSX file : {}", filepath.display());
-        XLSXExporter { filepath: filepath.display().to_string(), workbook: rust_xlsxwriter::Workbook::new(), current_row : 0 }
+        XLSXExporter { filepath: filepath.display().to_string(), workbook: rust_xlsxwriter::Workbook::new(), current_row : 0, config:None }
+    }
+
+    fn set_config(&mut self, config : &GameConfig) {
+        self.config = Some(config.clone());
     }
 
     fn begin(&mut self) {
@@ -771,9 +523,11 @@ impl Exporter for XLSXExporter {
             let bold = Format::new().set_bold();
             let dark_bg = Format::new().set_font_color(Color::White).set_background_color(Color::Gray);
 
-            let _ = worksheet.write_row_with_format(0, 0, LANGUAGES_FULL, &bold);
-            let _ = worksheet.set_column_range_format(0, LANGUAGES_COUNT as u16, &dark_bg);
-            if let Err(e) = worksheet.set_column_range_width(0, LANGUAGES_COUNT as u16, 50) {
+            let languages = if let Some(conf) = &self.config {(conf.get_languages)()} else { &[] };
+            let lang_count =  if let Some(config) = &self.config { (config.get_languages)().len()} else {0};
+            let _ = worksheet.write_row_with_format(0, 0, languages.iter().map(|l| l.1), &bold);
+            let _ = worksheet.set_column_range_format(0, lang_count as u16, &dark_bg);
+            if let Err(e) = worksheet.set_column_range_width(0, lang_count as u16, 50) {
                 println!("Error setting col width : {e}");
             }
            
@@ -784,9 +538,11 @@ impl Exporter for XLSXExporter {
 
     fn add_row(&mut self , msg : &Message, ignore_tags : bool) {
         if let Ok(worksheet) = self.workbook.worksheet_from_index(0) {
-            for i in 0..LANGUAGES_COUNT {
+
+            let lang_count =  if let Some(config) = &self.config { (config.get_languages)().len()} else {0};
+            for i in 0..lang_count {
                 if ignore_tags {
-                    let _ = worksheet.write(self.current_row as u32 , i as u16, msg.get_raw(i));
+                    let _ = worksheet.write(self.current_row as u32 , i as u16, msg.get_raw(i, self.config.as_ref()));
                 } else {
                     let mut cell_color = Color::White;
                     let mut cell_align = FormatAlign::default();
@@ -808,7 +564,7 @@ impl Exporter for XLSXExporter {
                                                     .set_text_wrap();
                                                     
 
-                    let segments = msg.get_xlsx_formatted(i, ignore_tags, cell_color);
+                    let segments = msg.get_xlsx_formatted(i, ignore_tags, cell_color, self.config.as_ref());
 
                     if !segments.is_empty() {
                         let segments_ref : Vec<_>= segments.iter().map(|(a,b)| (a,b.as_str())).collect();
@@ -851,14 +607,15 @@ impl BMGParser {
         let idx = msg.id - 1;//if msg.id > 0 {} else {self.msgs[bank_id].len()};
 
         if idx + 1> self.msgs[bank_id].len() { self.msgs[bank_id].resize_with(idx + 1, || Message::default() );}
-
+        
         self.msgs[bank_id][idx].id = msg.id;
-
+        
         if self.msgs[bank_id][idx].attribs.is_empty() {
             self.msgs[bank_id][idx].attribs = msg.attribs.clone();
         }
-
-
+        
+        
+        if lang_idx >= self.msgs[bank_id][idx].text.len() { self.msgs[bank_id][idx].text.resize(lang_idx +1, Vec::new()); }
         if !self.msgs[bank_id][idx].text[lang_idx].is_empty()
         {
             println!("ALREADY USED : {}, {:#x}, lang {}", bank_id, idx, lang_idx);
@@ -870,9 +627,10 @@ impl BMGParser {
         }  
     }
 
-    fn export_html(&self, filepath: &Path, ignore_tags : bool) {
+    fn export_html(&self, filepath: &Path, ignore_tags : bool, config : &GameConfig) {
         
         let mut exporter = HTMLExporter::new(filepath);
+        exporter.set_config(config);
         exporter.begin();
         exporter.set_headers();
 
@@ -884,9 +642,10 @@ impl BMGParser {
         exporter.end();
     }
 
-    fn export_csv(&self, filepath: &Path ) {
+    fn export_csv(&self, filepath: &Path, config : &GameConfig) {
         
         let mut exporter = CSVExporter::new(filepath);
+        exporter.set_config(config);
         exporter.begin();
         exporter.set_headers();
 
@@ -899,8 +658,9 @@ impl BMGParser {
     }
 
 
-    fn export_xlsx(&self, filepath: &Path, ignore_tags : bool) {
+    fn export_xlsx(&self, filepath: &Path, ignore_tags : bool, config : &GameConfig) {
         let mut exporter = XLSXExporter::new(filepath);
+        exporter.set_config(config);
         exporter.begin();
         exporter.set_headers();
 
@@ -942,24 +702,34 @@ fn process_language(lang_idx : usize, lang_id : &str, parser : &mut BMGParser, u
     }
 }
 
+fn process_config(parser : &mut BMGParser, config : &GameConfig, use_raw : bool)
+{
+    for (lang_idx, lang) in (config.get_languages)().iter().enumerate() {
+        //process_language(lang_idx,lang.0, parser, true);
+        let str_path = &format!("./res/{}/Msg{}", config.id, lang.0);
+        let folder_path = Path::new(&str_path);
+
+        for (bank_id,&basename) in (config.get_filenames)().iter().enumerate() {
+
+            let filename = basename.to_owned() + if use_raw {".bmg"} else {".txt"};
+            let _ = process_file(&folder_path.join(&filename), lang_idx, bank_id, parser);
+        }
+    }
+}
+
 fn main() {
 
     let mut parser : BMGParser = Default::default();
-    
-    for (lang_idx, lang) in LANGUAGES.iter().enumerate() {
-        process_language(lang_idx,lang, &mut parser, true);
-    }
 
-    // parser.export_html(Path::new("index.html"), false);
-    // parser.export_csv(Path::new("textdump.csv"));
-    // parser.export_xlsx(Path::new("textdump.xlsx"), false);
-
+    process_config(&mut parser, &game_configs::TP, true);
+    parser.export_html(Path::new("index.html"), false, &game_configs::TP);
+    parser.export_csv(Path::new("textdump.csv"), &game_configs::TP);
+    parser.export_xlsx(Path::new("textdump.xlsx"), false, &game_configs::TP);
 
     let mut tww_parser = BMGParser::default();
-    let _ = process_file(Path::new("./res/TWW/zel_00.bmg"), 0, 0, &mut tww_parser);
 
-    tww_parser.export_csv(Path::new("tww.csv"));
-    tww_parser.export_html(Path::new("tww.html"), false);
-    //bmg_raw_parser::print_bmg(Path::new("./res/TWW/zel_00.bmg"));
-
+    process_config(&mut tww_parser, &game_configs::TWW, true);
+    tww_parser.export_csv(Path::new("tww.csv"), &game_configs::TWW);
+    tww_parser.export_html(Path::new("tww.html"), false, &game_configs::TWW);
+    parser.export_xlsx(Path::new("tww.xlsx"), false, &game_configs::TWW);
 }
