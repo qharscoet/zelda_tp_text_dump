@@ -293,18 +293,21 @@ impl Exporter for HTMLExporter  {
         let ruby_font =  match &self.config {
             Some(conf) => match conf.id {
                 "tp" => "reishotai",
-                "tww" => "fot-rodin_prondb",
+                "tww" => "fot-rodin-prondb",
                 _ => "fot-rodin-prondb"
             }
             None => "fot-rodin-prondb"
-            
         };
+
+        let id = self.config.as_ref().map(|c| c.id).unwrap_or_default();
+
+        let logo_url = self.config.as_ref().map(|conf| conf.logo).unwrap_or("https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Zelda_Logo.svg/1280px-Zelda_Logo.svg.png");
         let _ = f.write(format!("<!DOCTYPE html>
 <html>
 <head>
 <style>
     @font-face {{
-        font-family: 'fot-rodin_prondb';
+        font-family: 'fot-rodin-prondb';
         src: url(\"assets/FOT-RodinProN-DB.otf\");
         font-weight: normal;
         font-style: normal;
@@ -348,28 +351,55 @@ impl Exporter for HTMLExporter  {
 }}
 td {{
     border: 1px solid white;
-    background: rgb(0 0 0 / 90%);
     border-radius: 10px;
     padding:1em;
     }}
 
-th {{
-        color:black; 
+thead tr {{
+    color:black; 
+    background-color: initial;
 }}
+
 tr {{
     color: white;
     height: 48px;
+    background: rgb(0 0 0 / 90%);
+}}
+
+
+nav {{
+    position: sticky;
+    background: white;
+    top: 0;
+}}
+
+nav a:link,  nav a:visited {{
+  background-color: #0d6efd;
+  color: white;
+  padding: 14px 25px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  border-radius: 10px;
+    padding:1em;
+}}
+
+nav a:hover, nav a:active {{
+  background-color: #0b5ed7;
 }}
 </style>
+<link href=\"styles/{id}.css\" rel=\"stylesheet\" />
 </head>
 <body>
 <header>
-  <img src=\"https://www.nintendo.com/jp/character/zelda/history/img/branch-c/02/pc/logo.png\"/>
+  <img src=\"{logo_url}\"/>
 </header>
-<div id=\"options\">
+<nav id=\"options\">
     <input id=\"hide-furi\" type=\"checkbox\" name=\"HideFuri\" />
     <label for=\"HideFuri\">Hide Japanese Furigana</label>
-</div>
+    <a href=\"download/{id}.csv\">Download CSV</a>
+    <a href=\"download/{id}.xlsx\">Download Excel</a>
+</nav>
 <table>").as_bytes());
         }
         
@@ -396,17 +426,19 @@ tr {{
 
     fn add_row(&mut self, msg : &Message, ignore_tags : bool) {
         if let Some(f) = &mut self.file {
-            let display_style = match msg.attribs.get_display_style() {
-                0x00 => "", //TODO : add dark background
-                0x01 => "", // no background
-                0x07 => "style='text-align: center;'",
-                0x0C => "style='font-family: \"reishotai\", \"ＭＳ 明朝\", serif;'",
-                0x0D => "style='color:#b4c8e6;'",
-                0x0E => "style='color:#aadc8c;'",
-                0x13 => "style='text-align: center; font-family: \"reishotai\", \"ＭＳ 明朝\", serif;'",
-                _ => ""
-            };
-            let mut s  = format!("<tr {display_style}>");
+            let style_info = self.config.as_ref().map(|c| (c.get_message_style)(&msg.attribs)).unwrap_or_default();
+
+            let mut style_str = String::new();
+            if style_info.centered { style_str += "text-align: center; "};
+            if style_info.alt_font { style_str += "font-family: \"reishotai\", \"ＭＳ 明朝\", serif;"}
+            if !style_info.color.is_empty() { style_str += &format!("color:{};", style_info.color)}
+            if !style_info.bg_color.is_empty() { style_str += &format!("background-color:{};", style_info.bg_color)}
+
+            if !style_str.is_empty() { style_str = format!("style='{style_str}'")}
+
+            let class_str = if !style_info.style_id.is_empty() { format!(" class=\"{}\"", style_info.style_id )} else {String::new()};
+
+            let mut s  = format!("<tr {style_str}{class_str}>");
     
             let lang_count =  if let Some(config) = &self.config { (config.get_languages)().len()} else {0};
             for i in 0..lang_count {
@@ -546,21 +578,17 @@ impl Exporter for XLSXExporter {
                 } else {
                     let mut cell_color = Color::White;
                     let mut cell_align = FormatAlign::default();
-                    match msg.attribs.get_display_style() {
-                        0x00 => {}, //TODO : add dark background
-                        0x01 => {}, // no background
-                        0x07 => { cell_align = FormatAlign::Center;},
-                        0x0C => {},//"style='font-family: \"reishotai\", \"ＭＳ 明朝\", serif;'",
-                        0x0D => {cell_color = Color::from(COLORS_RGB[5])},//"style='color:#b4c8e6;'",
-                        0x0E => {cell_color = Color::from(COLORS_RGB[2])},//"style='color:#aadc8c;'",
-                        0x13 => { cell_align = FormatAlign::Center;},//"style='text-align: center; font-family: \"reishotai\", \"ＭＳ 明朝\", serif;'",
-                        _ => {}
-                    };
+                    let mut cell_bg_color = Color::Gray;
 
+                    let style_info = self.config.as_ref().map(|c| (c.get_message_style)(&msg.attribs)).unwrap_or_default();
+                    if style_info.centered { cell_align = FormatAlign::Center}
+                    if !style_info.color.is_empty() { cell_color = Color::from(style_info.color.as_str())}
+                    if !style_info.bg_color.is_empty() { cell_bg_color = Color::from(style_info.bg_color.as_str())}
                     
                     let cell_format = Format::new().set_font_color(cell_color)
-                                                    .set_background_color(Color::Gray)
+                                                    .set_background_color(cell_bg_color)
                                                     .set_align(cell_align)
+                                                    .set_align(FormatAlign::VerticalCenter)
                                                     .set_text_wrap();
                                                     
 
@@ -717,19 +745,46 @@ fn process_config(parser : &mut BMGParser, config : &GameConfig, use_raw : bool)
     }
 }
 
+fn generate_index(filepath : &Path) {
+
+    if let Ok(mut f) = File::create(filepath) {
+        let _ = f.write(b"<html lang=\"en\">
+<head>
+    <meta charset=\"UTF-8\">
+    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
+    <title>Zelda Text Dumps</title>
+</head>
+<body style=\"text-align:center\">
+<h1> Zelda comparison tables </h1>
+<div>");
+
+        for conf in game_configs::ALL_CONFIGS {
+            let _ = f.write(format!("<a href=\"{}.html\"><img src=\"{}\"/></a>", conf.id, conf.logo).as_bytes());
+        }
+
+
+
+
+        let _ = f.write(b"</div></body>
+</html>");
+    }
+}
+
 fn main() {
+
+    generate_index(Path::new("./www/index.html"));
 
     let mut parser : BMGParser = Default::default();
 
     process_config(&mut parser, &game_configs::TP, true);
-    parser.export_html(Path::new("index.html"), false, &game_configs::TP);
-    parser.export_csv(Path::new("textdump.csv"), &game_configs::TP);
-    parser.export_xlsx(Path::new("textdump.xlsx"), false, &game_configs::TP);
+    parser.export_html(Path::new("./www/tp.html"), false, &game_configs::TP);
+    parser.export_csv(Path::new("./www/download/tp.csv"), &game_configs::TP);
+    parser.export_xlsx(Path::new("./www/download/tp.xlsx"), false, &game_configs::TP);
 
     let mut tww_parser = BMGParser::default();
 
     process_config(&mut tww_parser, &game_configs::TWW, true);
-    tww_parser.export_csv(Path::new("tww.csv"), &game_configs::TWW);
-    tww_parser.export_html(Path::new("tww.html"), false, &game_configs::TWW);
-    parser.export_xlsx(Path::new("tww.xlsx"), false, &game_configs::TWW);
+    tww_parser.export_html(Path::new("./www/tww.html"), false, &game_configs::TWW);
+    tww_parser.export_csv(Path::new("./www/download/tww.csv"), &game_configs::TWW);
+    tww_parser.export_xlsx(Path::new("./www/download/tww.xlsx"), false, &game_configs::TWW);
 }

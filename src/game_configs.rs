@@ -1,21 +1,34 @@
-use crate::bmg_message::Tag;
+use crate::bmg_message::{MessageAttributes, Tag};
+
+#[derive(Default)]
+pub struct StyleInfo {
+    pub centered:bool,
+    pub color:String,
+    pub bg_color:String,
+    pub alt_font:bool,
+    pub style_id:String
+}
 
 #[derive(Clone)]
 pub struct GameConfig {
     pub name: &'static str,
     pub id : &'static str,
+    pub logo : &'static str,
 
     pub get_color_hex: fn(usize) -> &'static str,
     pub get_tag_replacement: fn(&Tag) -> &str,
+    pub get_message_style : fn(&MessageAttributes) -> StyleInfo,
 
     pub get_languages : fn() -> &'static [(&'static str, &'static str)],
     pub get_filenames : fn() -> &'static [&'static str]
 }
 
+pub const ALL_CONFIGS  : [&GameConfig;2]= [&TP, &TWW];
 
 pub const TWW: GameConfig = GameConfig {
     name: "The Wind Waker",
     id: "tww",
+    logo : "https://www.nintendo.com/jp/character/zelda/history/img/branch-d/01/pc/logo.png",
     get_languages : || {
         const LANGUAGES : [(&str, &str);4] = [
             ("jp", "Japanese"),
@@ -128,11 +141,37 @@ pub const TWW: GameConfig = GameConfig {
             _=> ""
         }
     },
+
+    get_message_style : |attribs: &MessageAttributes| {
+        let mut centered = false;
+        let mut color = String::new();
+        let mut bg_color = String::new();
+        
+        match attribs.payload[0x08] {
+            0x01 => { bg_color = String::from("#3F48CC");}
+            0x02 => { bg_color = String::from("#A68752"); color = String::from("#000000");}
+            0x06 => { bg_color = String::from("#84795A"); color = String::from("#000000");}
+            0x07 => { bg_color = String::from("#BDA273"); color = String::from("#000000");}
+            0x09 => { bg_color = String::from("#3F48CC");}
+            0x0D => { centered = true; }
+            0x0E => { bg_color = String::from("#3F48CC"); }
+            _ => {}
+        }
+        
+        
+        let style_id = match attribs.payload[0x08] {
+            0x01|0x02|0x06|0x07|0x09|0x0D|0x0E => format!("display-{}", attribs.payload[0x08]),
+            _  => String::new()
+        };
+
+        StyleInfo { centered, color, bg_color, alt_font : false, style_id }
+    }
 };
 
 pub const TP: GameConfig = GameConfig {
     name: "Twilight Princess",
     id:"tp",
+    logo : "https://www.nintendo.com/jp/character/zelda/history/img/branch-c/02/pc/logo.png",
     get_languages : || {
         const LANGUAGES : [(&str, &str);4] = [
             ("jp", "Japanese"),
@@ -301,5 +340,24 @@ pub const TP: GameConfig = GameConfig {
             },
             _=> "",
         }
+    },
+
+    get_message_style : |attribs: &MessageAttributes| {
+        let mut centered = false;
+        let mut color = String::new();
+        let mut alt_font = false;
+
+        match attribs.payload[0x05] {
+            0x00 => {}, //TODO : add dark background
+            0x01 => {}, // no background
+            0x07 => centered = true,
+            0x0C => alt_font = true,
+            0x0D => color = String::from("#b4c8e6"),
+            0x0E => color = String::from("#aadc8c"),
+            0x13 => {centered = true; alt_font = true;},
+            _ => {}
+        }
+
+        StyleInfo { centered, color, bg_color : String::new(), alt_font, style_id : String::new() }
     }
 };
