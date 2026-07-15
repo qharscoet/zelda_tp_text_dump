@@ -14,6 +14,7 @@ pub struct GameConfig {
     pub name: &'static str,
     pub id : &'static str,
     pub logo : &'static str,
+    pub big_endian : bool,
 
     pub get_color_hex: fn(usize) -> &'static str,
     pub get_tag_replacement: fn(&Tag) -> &str,
@@ -23,12 +24,13 @@ pub struct GameConfig {
     pub get_filenames : fn() -> &'static [&'static str]
 }
 
-pub const ALL_CONFIGS  : [&GameConfig;2]= [&TP, &TWW];
+pub const ALL_CONFIGS  : [&GameConfig;3]= [&TP, &TWW, &PH];
 
 pub const TWW: GameConfig = GameConfig {
     name: "The Wind Waker",
     id: "tww",
     logo : "https://www.nintendo.com/jp/character/zelda/history/img/branch-d/01/pc/logo.png",
+    big_endian : true,
     get_languages : || {
         const LANGUAGES : [(&str, &str);4] = [
             ("jp", "Japanese"),
@@ -43,7 +45,7 @@ pub const TWW: GameConfig = GameConfig {
     },
     get_filenames : || {
         const FILENAMES : [&str;1] = [
-            "zel_00",
+            "zel_00.bmg",
         ];
 
         &FILENAMES
@@ -172,6 +174,7 @@ pub const TP: GameConfig = GameConfig {
     name: "Twilight Princess",
     id:"tp",
     logo : "https://www.nintendo.com/jp/character/zelda/history/img/branch-c/02/pc/logo.png",
+    big_endian : true,
     get_languages : || {
         const LANGUAGES : [(&str, &str);4] = [
             ("jp", "Japanese"),
@@ -186,16 +189,16 @@ pub const TP: GameConfig = GameConfig {
     },
     get_filenames : || {
         const FILENAMES : [&str;10] = [
-            "zel_00",
-            "zel_01",
-            "zel_02",
-            "zel_03",
-            "zel_04",
-            "zel_05",
-            "zel_06",
-            "zel_07",
-            "zel_08",
-            "zel_99",
+            "zel_00.bmg",
+            "zel_01.bmg",
+            "zel_02.bmg",
+            "zel_03.bmg",
+            "zel_04.bmg",
+            "zel_05.bmg",
+            "zel_06.bmg",
+            "zel_07.bmg",
+            "zel_08.bmg",
+            "zel_99.bmg",
         ];
 
         &FILENAMES
@@ -359,5 +362,105 @@ pub const TP: GameConfig = GameConfig {
         }
 
         StyleInfo { centered, color, bg_color : String::new(), alt_font, style_id : String::new() }
+    }
+};
+
+pub const PH: GameConfig = GameConfig {
+    name: "Phantom Hourglass",
+    id: "ph",
+    logo : "https://www.nintendo.com/jp/character/zelda/history/img/branch-d/02/pc/logo.png",
+    big_endian : false,
+    get_languages : || {
+        const LANGUAGES : [(&str, &str);1] = [
+            ("jp", "Japanese"),
+            // ("uk", "English"),
+            // ("fr", "French"),
+            // // ("sp", "Spanish"),
+            // ("de", "German"),
+            // ("it" "Italian")
+        ];
+
+        &LANGUAGES
+    },
+    get_filenames : || {
+        const FILENAMES : [&str;1] = [
+            "battle.bmg",
+            // "battleCommon.bmg",
+            // "bossLast1.bmg",
+            // "bossLast3.bmg",
+            // "brave.bmg",
+            // "collect.bmg",
+            // "demo.bmg",
+            // "field.bmg",
+            // "flame.bmg",
+            // "frost.bmg",
+            // "ghost.bmg",
+            // "hidari.bmg",
+            // "kaitei_F.bmg",
+            // "kaitei.bmg",
+            // "kojima1.bmg",
+            // "kojima2.bmg",
+            // "kojima3.bmg",
+            // "kojima5.bmg",
+            // "main_isl.bmg",
+            // "mainselect.bmg",
+            // "myou.bmg",
+            // "power.bmg",
+            // "regular.bmg",
+            // "sea.bmg",
+            // "sennin.bmg",
+            // "ship.bmg",
+            // "staff.bmg",
+            // "system.bmg",
+            // "torii.bmg",
+            // "wind.bmg",
+            // "wisdom_dngn.bmg",
+            // "wisdom.bmg",
+        ];
+
+        &FILENAMES
+    },
+    get_color_hex: |id| {
+        const COLORS_RGB_TWW: [&str; 9] = [
+            "#ffffff",
+            "#ff6400",
+            "#00ff00",
+            "#7878ff",
+            "#ffff3c",
+            "#00ffff",
+            "#ff00ff",
+            "#828282",
+            "#ff8000",
+        ];
+
+        COLORS_RGB_TWW[id]
+    },
+    get_tag_replacement : |tag| {
+        match tag.group {
+            0x00 => "[Tag]",
+            _=> ""
+        }
+    },
+
+    get_message_style : |attribs: &MessageAttributes| {
+        let mut centered = false;
+        let mut color = String::new();
+        let mut bg_color = String::new();
+        
+        // match attribs.payload[0x08] {
+        //     0x01 => { bg_color = String::from("#3F48CC");}
+        //     0x02 => { bg_color = String::from("#A68752"); color = String::from("#000000");}
+        //     0x06 => { bg_color = String::from("#84795A"); color = String::from("#000000");}
+        //     0x07 => { bg_color = String::from("#BDA273"); color = String::from("#000000");}
+        //     0x09 => { bg_color = String::from("#3F48CC");}
+        //     0x0D => { centered = true; }
+        //     0x0E => { bg_color = String::from("#3F48CC"); }
+        //     _ => {}
+        // }
+        
+        
+        let style_id = String::new();
+
+        StyleInfo { centered, color, bg_color, alt_font : false, style_id }
     }
 };

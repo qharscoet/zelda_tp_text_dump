@@ -8,7 +8,6 @@ mod utils;
 mod game_configs;
 
 use bmg_message::{Message, Tag, TextPart, LANGUAGES_COUNT};
-use utils::{get_u16};
 
 use crate::{bmg_message::{MessageParser, MessageSingleLang, get_raw_msg}, game_configs::GameConfig};
 
@@ -124,6 +123,9 @@ impl Message {
                                         },
                                         0x01 => {
     
+                                            let big_endian = config.map(|c| c.big_endian).unwrap_or(true);
+                                            let get_u16 = if big_endian { utils::get_u16_be } else {utils::get_u16_le};
+
                                             let new_size = get_u16(&tag.payload, 0);
                                             if current_size != 100 {
                                                 res_str += "</span>"
@@ -192,6 +194,9 @@ impl Message {
                                         },
                                         0x01 => {
     
+                                            let big_endian = config.map(|c| c.big_endian).unwrap_or(true);
+                                            let get_u16 = if big_endian { utils::get_u16_be } else {utils::get_u16_le};
+                                            
                                             current_size = get_u16(&tag.payload, 0);
                                             //Size
                                         },
@@ -632,7 +637,7 @@ impl BMGParser {
             return;
         }
 
-        let idx = msg.id - 1;//if msg.id > 0 {} else {self.msgs[bank_id].len()};
+        let idx = if msg.id > 0 { msg.id - 1} else {self.msgs[bank_id].len()};
 
         if idx + 1> self.msgs[bank_id].len() { self.msgs[bank_id].resize_with(idx + 1, || Message::default() );}
         
@@ -701,13 +706,13 @@ impl BMGParser {
     }
 }
 
-fn process_file(filename : &Path, lang_id : usize, bank_id : usize, parser : &mut BMGParser) -> io::Result<()> {
+fn process_file(filename : &Path, lang_id : usize, bank_id : usize, parser : &mut BMGParser, big_endian : bool) -> io::Result<()> {
 
     println!("opening file {}", filename.display());
     // Tried some shennaningans
     let p : Box<dyn MessageParser> = match filename.extension().and_then(|s| s.to_str()) {
         Some("txt") => Box::new(bmg_text_parser::open_bmg(filename)?),
-        Some("bmg") => Box::new(bmg_raw_parser::open_bmg(filename)?),
+        Some("bmg") => Box::new(bmg_raw_parser::open_bmg(filename, big_endian)?),
         None => todo!(),
         _ => todo!()
     };
@@ -719,28 +724,17 @@ fn process_file(filename : &Path, lang_id : usize, bank_id : usize, parser : &mu
     Ok(())
 }
 
-fn process_language(lang_idx : usize, lang_id : &str, parser : &mut BMGParser, use_raw : bool) {
-    let str_path = &format!("./res/Msg{}", lang_id);
-    let folder_path = Path::new(&str_path);
-
-    for (bank_id,&basename) in FILENAMES.iter().enumerate() {
-
-        let filename = basename.to_owned() + if use_raw {".bmg"} else {".txt"};
-        let _ = process_file(&folder_path.join(&filename), lang_idx, bank_id, parser);
-    }
-}
-
 fn process_config(parser : &mut BMGParser, config : &GameConfig, use_raw : bool)
 {
     for (lang_idx, lang) in (config.get_languages)().iter().enumerate() {
         //process_language(lang_idx,lang.0, parser, true);
-        let str_path = &format!("./res/{}/Msg{}", config.id, lang.0);
+        let str_path = &format!("./res/{}/{}", config.id, lang.1);
         let folder_path = Path::new(&str_path);
 
         for (bank_id,&basename) in (config.get_filenames)().iter().enumerate() {
 
-            let filename = basename.to_owned() + if use_raw {".bmg"} else {".txt"};
-            let _ = process_file(&folder_path.join(&filename), lang_idx, bank_id, parser);
+            //let filename = basename.to_owned() + if use_raw {".bmg"} else {".txt"};
+            let _ = process_file(&folder_path.join(&basename), lang_idx, bank_id, parser, config.big_endian);
         }
     }
 }
@@ -762,9 +756,6 @@ fn generate_index(filepath : &Path) {
             let _ = f.write(format!("<a href=\"{}.html\"><img src=\"{}\"/></a>", conf.id, conf.logo).as_bytes());
         }
 
-
-
-
         let _ = f.write(b"</div></body>
 </html>");
     }
@@ -774,17 +765,25 @@ fn main() {
 
     generate_index(Path::new("./www/index.html"));
 
-    let mut parser : BMGParser = Default::default();
+    // let mut parser : BMGParser = Default::default();
 
-    process_config(&mut parser, &game_configs::TP, true);
-    parser.export_html(Path::new("./www/tp.html"), false, &game_configs::TP);
-    parser.export_csv(Path::new("./www/download/tp.csv"), &game_configs::TP);
-    parser.export_xlsx(Path::new("./www/download/tp.xlsx"), false, &game_configs::TP);
+    // process_config(&mut parser, &game_configs::TP, true);
+    // parser.export_html(Path::new("./www/tp.html"), false, &game_configs::TP);
+    // parser.export_csv(Path::new("./www/download/tp.csv"), &game_configs::TP);
+    // parser.export_xlsx(Path::new("./www/download/tp.xlsx"), false, &game_configs::TP);
 
-    let mut tww_parser = BMGParser::default();
+    // let mut tww_parser = BMGParser::default();
 
-    process_config(&mut tww_parser, &game_configs::TWW, true);
-    tww_parser.export_html(Path::new("./www/tww.html"), false, &game_configs::TWW);
-    tww_parser.export_csv(Path::new("./www/download/tww.csv"), &game_configs::TWW);
-    tww_parser.export_xlsx(Path::new("./www/download/tww.xlsx"), false, &game_configs::TWW);
+    // process_config(&mut tww_parser, &game_configs::TWW, true);
+    // tww_parser.export_html(Path::new("./www/tww.html"), false, &game_configs::TWW);
+    // tww_parser.export_csv(Path::new("./www/download/tww.csv"), &game_configs::TWW);
+    // tww_parser.export_xlsx(Path::new("./www/download/tww.xlsx"), false, &game_configs::TWW);
+    bmg_raw_parser::print_bmg(Path::new("./res/ph/Japanese/battle.bmg"));
+
+    let mut ph = BMGParser::default();
+
+    process_config(&mut ph, &game_configs::PH, true);
+    ph.export_html(Path::new("./www/ph.html"), false, &game_configs::PH);
+    ph.export_csv(Path::new("./www/download/ph.csv"), &game_configs::PH);
+    // ph.export_xlsx(Path::new("./www/download/ph.xlsx"), false, &game_configs::PH);
 }
