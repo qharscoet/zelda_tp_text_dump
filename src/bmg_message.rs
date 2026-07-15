@@ -13,11 +13,11 @@ pub struct MessageAttributes {
 
 
 impl MessageAttributes {
-    pub fn get_message_id(&self) -> u16 {
+    pub fn get_message_id(&self) -> Option<u16> {
         if self.payload.len() > 16 { //This should exclude PH
-            get_u16_be(&self.payload, 0)
+            Some(get_u16_be(&self.payload, 0))
         } else {
-            0
+            None
         }
     }
 
@@ -160,4 +160,5 @@ impl fmt::Debug for Tag {
 
 pub trait MessageParser {
     fn get_all_messages(&self) -> Vec<MessageSingleLang>;
+    fn get_encoding(&self) -> &'static encoding_rs::Encoding;
 }

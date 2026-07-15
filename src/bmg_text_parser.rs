@@ -6,6 +6,7 @@ use crate::{bmg_message::{MessageParser,MessageAttributes, MessageSingleLang, Ta
 
 static RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?P<ID>[[:xdigit:]]+) (@(?P<slot>[[:xdigit:]]{4}) )?(?P<attribs>\[.+\]) = (?P<str>.+)?").unwrap());
 static RE_TAG: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\\[x|z]\{(.*?)\}").unwrap());
+static RE_ENCODING: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"@ENCODING\s+= (\d)").unwrap());
 
 impl std::str::FromStr for Tag {
     type Err = &'static str;
@@ -100,17 +101,37 @@ impl std::str::FromStr for MessageSingleLang {
 }
 
 pub struct BMGTextParser{
-    messages : Vec<MessageSingleLang>
+    messages : Vec<MessageSingleLang>,
+    encoding : &'static encoding_rs::Encoding,
 }
 
 impl BMGTextParser {
 
     fn new(lines : impl Iterator<Item=std::string::String>) -> Self
     {
-        let iter = lines.skip_while(|l|  !RE.is_match(l) );
+        let  mut iter = lines.skip_while(|l|  !RE_ENCODING.is_match(l) );
+
+        let s = iter.next().unwrap();
+        let iter = iter.skip_while(|l|  !RE.is_match(l) );
+
+        let mut encoding = 0;
+
+        if let Some(caps) = RE_TAG.captures(&s) {
+            let val = caps.get(1).map_or("0", |m| m.as_str());
+
+            encoding = val.parse::<u32>().unwrap_or_default();
+        }
+
+       let encoding = match encoding {
+            1 => encoding_rs::WINDOWS_1252,
+            2 => encoding_rs::UTF_16LE, // LE as the only cases we have now are LE, might need to generalise this
+            3 => encoding_rs::SHIFT_JIS,
+            _ => encoding_rs::WINDOWS_1252, // Default to WINDOWS_1252 if unknown
+        };
 
         BMGTextParser {
-            messages :  iter.flat_map(|l| l.parse()).collect()
+            messages :  iter.flat_map(|l| l.parse()).collect(),
+            encoding
         }
     }   
 }
@@ -118,6 +139,10 @@ impl BMGTextParser {
 impl MessageParser for BMGTextParser {
     fn get_all_messages(&self) -> Vec<MessageSingleLang> {
        self.messages.clone()
+    }
+
+    fn get_encoding(&self) -> &'static encoding_rs::Encoding {
+        encoding_rs::SHIFT_JIS
     }
 }
 

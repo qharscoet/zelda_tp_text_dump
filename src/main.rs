@@ -109,7 +109,8 @@ impl Message {
                         TextPart::Tag(tag) => {
                             match tag.group {
                                 0xFF => {
-                                    match tag.number {
+                                    let real_number = if config.map(|c| c.big_endian).unwrap_or(true) { tag.number} else {tag.number.swap_bytes()};
+                                    match real_number {
                                         0x00 => { // change color
                                             let new_color = tag.payload[0] as usize;
                                             if current_color != 0 {
@@ -138,10 +139,20 @@ impl Message {
                                         },
                                         0x02 => {
                                             let over_count = tag.payload[0];
-                                            let raw_shiftjs : Vec<_>= tag.payload[1..].iter().map(|v| *v).collect();
-                                            let decoded_ruby = encoding_rs::SHIFT_JIS.decode(&raw_shiftjs).0;
+                                            let last_is_zero = tag.payload[tag.payload.len() -1] == 0x00;
+                                            let slice_end = tag.payload.len() - (last_is_zero as usize);
+                                            let raw_bytes = &tag.payload[1..slice_end];
+
+                                            let encoding = config.map(|c| 
+                                                match c.id  {
+                                                   "ph" => encoding_rs::UTF_16LE,
+                                                   _ => encoding_rs::SHIFT_JIS, 
+                                                }).unwrap_or(encoding_rs::SHIFT_JIS);
+
+
+
+                                            let decoded_ruby = encoding.decode(&raw_bytes).0;
                                             needs_ruby = Some((over_count, decoded_ruby.to_string()));
-                                            //println!("{}", decoded_ruby);
                                         },
                                         _ => {}
                                     }
@@ -240,6 +251,7 @@ impl Message {
 #[derive(Default, Debug)]
 struct BMGParser {
     msgs : [Vec<Message>; BANK_COUNT],
+    encoding : Option<&'static encoding_rs::Encoding>,
 }
 
 impl BMGParser {
@@ -637,7 +649,7 @@ impl BMGParser {
             return;
         }
 
-        let idx = if msg.id > 0 { msg.id - 1} else {self.msgs[bank_id].len()};
+        let idx = msg.id - 1;//if msg.id > 0 {} else {self.msgs[bank_id].len()};
 
         if idx + 1> self.msgs[bank_id].len() { self.msgs[bank_id].resize_with(idx + 1, || Message::default() );}
         
@@ -721,6 +733,8 @@ fn process_file(filename : &Path, lang_id : usize, bank_id : usize, parser : &mu
         parser.add_message(&m, lang_id, bank_id);
     }
 
+    parser.encoding = Some(p.get_encoding());
+
     Ok(())
 }
 
@@ -765,20 +779,20 @@ fn main() {
 
     generate_index(Path::new("./www/index.html"));
 
-    // let mut parser : BMGParser = Default::default();
+    let mut parser : BMGParser = Default::default();
 
-    // process_config(&mut parser, &game_configs::TP, true);
-    // parser.export_html(Path::new("./www/tp.html"), false, &game_configs::TP);
-    // parser.export_csv(Path::new("./www/download/tp.csv"), &game_configs::TP);
-    // parser.export_xlsx(Path::new("./www/download/tp.xlsx"), false, &game_configs::TP);
+    process_config(&mut parser, &game_configs::TP, true);
+    parser.export_html(Path::new("./www/tp.html"), false, &game_configs::TP);
+    parser.export_csv(Path::new("./www/download/tp.csv"), &game_configs::TP);
+    parser.export_xlsx(Path::new("./www/download/tp.xlsx"), false, &game_configs::TP);
 
-    // let mut tww_parser = BMGParser::default();
+    let mut tww_parser = BMGParser::default();
 
-    // process_config(&mut tww_parser, &game_configs::TWW, true);
-    // tww_parser.export_html(Path::new("./www/tww.html"), false, &game_configs::TWW);
-    // tww_parser.export_csv(Path::new("./www/download/tww.csv"), &game_configs::TWW);
-    // tww_parser.export_xlsx(Path::new("./www/download/tww.xlsx"), false, &game_configs::TWW);
-    bmg_raw_parser::print_bmg(Path::new("./res/ph/Japanese/battle.bmg"));
+    process_config(&mut tww_parser, &game_configs::TWW, true);
+    tww_parser.export_html(Path::new("./www/tww.html"), false, &game_configs::TWW);
+    tww_parser.export_csv(Path::new("./www/download/tww.csv"), &game_configs::TWW);
+    tww_parser.export_xlsx(Path::new("./www/download/tww.xlsx"), false, &game_configs::TWW);
+    bmg_raw_parser::print_bmg(Path::new("./res/ph/French/battle.bmg"));
 
     let mut ph = BMGParser::default();
 

@@ -66,19 +66,35 @@ impl DAT1Data {
             _ => encoding_rs::WINDOWS_1252, // Default to WINDOWS_1252 if unknown
         };
 
-        let mut it = self.data[offset..].iter().peekable();
-        let mut it_16 = self.data[offset..].chunks_exact(2).peekable();
+        let mut it = self.data[offset..].iter();
         let mut end = false;
         let mut full_string = String::new();
         let mut text_parts : Vec<TextPart> = Vec::new();
+
+
         while !end {
+            let mut stop_value = 0u16;
             let str_bytes = if encoding == encoding_rs::UTF_16LE {
-                it_16.peeking_take_while(|&b| {
-                    let val = utils::get_u16_le(b, 0);
-                    val != 0x0000 && val!= 0x001A
-                }).flatten().map(|b| *b).collect::<Vec<_>>()
+                
+                // is easier to try to iterate properly by step of 2 bytes without iterator typing weirdness
+                let mut str_end = false;
+                let mut str = Vec::new();
+                while !str_end {
+                    let b1 = *it.next().unwrap();
+                    let b2 = *it.next().unwrap();
+                    let v = get_u16_le(&[b1,b2], 0);
+
+                    if v != 0x00000 && v != 0x001A {
+                        str.push(b1);
+                        str.push(b2);
+                    } else {
+                        stop_value = v;
+                        str_end = true;
+                    }
+                }
+                str
             } else {
-                it.peeking_take_while(|&&b| b!=0x00 && b!=0x1A).map(|b| *b).collect::<Vec<_>>()
+                it.by_ref().take_while(|&&b| { stop_value = b as u16; b!=0x00 && b!=0x1A }).map(|b| *b).collect::<Vec<_>>()
             };
 
             let str = encoding.decode(&str_bytes).0;
@@ -86,11 +102,12 @@ impl DAT1Data {
             full_string += &str;
             text_parts.push(TextPart::Text(str.to_string()));
             
-            match it.next().unwrap_or(&0x00) {
+            match stop_value {
                 0x00 => end = true,
                 0x1A => {
                     let size_bytes = it.next().unwrap_or(&0x00);
-                    let text_tag = it.by_ref().take(*size_bytes as usize - 2).map(|b| *b).collect::<Vec<_>>(); //Accounting for the 0x1A and size byte
+                    let payload_size = size_bytes - if encoding == encoding_rs::UTF_16LE { 3 } else {2};
+                    let text_tag = it.by_ref().take(payload_size as usize).map(|b| *b).collect::<Vec<_>>(); //Accounting for the 0x1A and size byte
                     text_parts.push(TextPart::Tag(Tag::from(&text_tag)));
                 },
                 _ => {}
@@ -427,10 +444,13 @@ impl BMGRawParser {
                 let attribs = MessageAttributes{payload : inf1_entry.attributes.clone()};
 
                 let id = if let Some(BMGSectionData::MID1(mid1)) = self.get_section(BMGData::MID1) {
-                    mid1.ids[idx]
+                    mid1.ids[idx] as usize
                 } else { 
-                    attribs.get_message_id() as u32
-                 } as usize;
+                    match attribs.get_message_id() {
+                        Some(id) => id as usize,
+                        None => idx +1
+                    }
+                 };
 
                 MessageSingleLang {
                     id : id,
@@ -503,6 +523,15 @@ impl MessageParser for BMGRawParser {
        } else {
         Vec::new()
        }
+    }
+
+    fn get_encoding(&self) -> &'static encoding_rs::Encoding {
+        match self.get_header().encoding {
+            1 => encoding_rs::WINDOWS_1252,
+            2 => encoding_rs::UTF_16LE, // LE as the only cases we have now are LE, might need to generalise this
+            3 => encoding_rs::SHIFT_JIS,
+            _ => encoding_rs::WINDOWS_1252, // Default to WINDOWS_1252 if unknown
+        }
     }
 }
 

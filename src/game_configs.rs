@@ -371,10 +371,10 @@ pub const PH: GameConfig = GameConfig {
     logo : "https://www.nintendo.com/jp/character/zelda/history/img/branch-d/02/pc/logo.png",
     big_endian : false,
     get_languages : || {
-        const LANGUAGES : [(&str, &str);1] = [
+        const LANGUAGES : [(&str, &str);3] = [
             ("jp", "Japanese"),
-            // ("uk", "English"),
-            // ("fr", "French"),
+            ("us", "English"),
+            ("fr", "French"),
             // // ("sp", "Spanish"),
             // ("de", "German"),
             // ("it" "Italian")
