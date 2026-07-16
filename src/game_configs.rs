@@ -24,7 +24,7 @@ pub struct GameConfig {
     pub get_filenames : fn() -> &'static [&'static str]
 }
 
-pub const ALL_CONFIGS  : [&GameConfig;3]= [&TP, &TWW, &PH];
+pub const ALL_CONFIGS  : [&GameConfig;4]= [&TP, &TWW, &PH, &ST];
 
 pub const TWW: GameConfig = GameConfig {
     name: "The Wind Waker",
@@ -416,6 +416,109 @@ pub const PH: GameConfig = GameConfig {
             "wind.bmg",
             "wisdom_dngn.bmg",
             "wisdom.bmg",
+        ];
+
+        &FILENAMES
+    },
+    get_color_hex: |id| {
+        const COLORS_RGB_TWW: [&str; 9] = [
+            "#ffffff",
+            "#ff6400",
+            "#00ff00",
+            "#7878ff",
+            "#ffff3c",
+            "#00ffff",
+            "#ff00ff",
+            "#828282",
+            "#ff8000",
+        ];
+
+        COLORS_RGB_TWW[id]
+    },
+    get_tag_replacement : |tag| {
+        let tag_number = tag.number.swap_bytes();
+        match tag.group {
+            0xFE => match tag_number {
+                0x00 => "[Link]",
+                0x0E => "[Number]",
+                _ => "[Unknown_Tag]"
+            },
+            _=> ""
+        }
+    },
+
+    get_message_style : |attribs: &MessageAttributes| {
+        let mut centered = false;
+        let mut color = String::new();
+        let mut bg_color = String::new();
+        
+        // match attribs.payload[0x08] {
+        //     0x01 => { bg_color = String::from("#3F48CC");}
+        //     0x02 => { bg_color = String::from("#A68752"); color = String::from("#000000");}
+        //     0x06 => { bg_color = String::from("#84795A"); color = String::from("#000000");}
+        //     0x07 => { bg_color = String::from("#BDA273"); color = String::from("#000000");}
+        //     0x09 => { bg_color = String::from("#3F48CC");}
+        //     0x0D => { centered = true; }
+        //     0x0E => { bg_color = String::from("#3F48CC"); }
+        //     _ => {}
+        // }
+        
+        
+        let style_id = String::new();
+
+        StyleInfo { centered, color, bg_color, alt_font : false, style_id }
+    }
+};
+
+pub const ST: GameConfig = GameConfig {
+    name: "Spirit Tracks",
+    id: "st",
+    logo : "https://www.nintendo.com/jp/character/zelda/history/img/branch-d/03/pc/logo.png",
+    big_endian : false,
+    get_languages : || {
+        const LANGUAGES : [(&str, &str);4] = [
+            ("jp", "Japanese"),
+            ("us", "English"),
+            ("fr", "French"),
+            // ("sp", "Spanish"),
+            ("de", "German"),
+            // ("it" "Italian")
+        ];
+
+        &LANGUAGES
+    },
+    get_filenames : || {
+        const FILENAMES : [&str;30] = [
+            "battle_common.bmg",
+            "battle_parent.bmg",
+            "castle_town.bmg",
+            "castle.bmg",
+            "collect.bmg",
+            "demo.bmg",
+            "demo01_05.bmg",
+            "demo06_10.bmg",
+            "demo11_15.bmg",
+            "demo16_20.bmg",
+            "demo21_25.bmg",
+            "desert.bmg",
+            "dungeon.bmg",
+            "field.bmg",
+            "flame_fld.bmg",
+            "flame.bmg",
+            "forest.bmg",
+            "intrain.bmg",
+            "maingame.bmg",
+            "post.bmg",
+            "regular.bmg",
+            "select.bmg",
+            "shop.bmg",
+            "snow.bmg",
+            "tower_lobby.bmg",
+            "tower.bmg",
+            "train_extra.bmg",
+            "train.bmg",
+            "village.bmg",
+            "water.bmg",
         ];
 
         &FILENAMES
