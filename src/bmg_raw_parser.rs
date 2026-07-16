@@ -409,24 +409,29 @@ impl BMGRawParser {
         let get_u16 = if big_endian { utils::get_u16_be } else {utils::get_u16_le};
 
         println!("Number of sections : {}", header.sections_cnt);
-        for _ in 0..header.sections_cnt {
-            let section_type = str::from_utf8(&data[offset..offset + 4])?.to_string();
-            let section_size = get_u32(&data, offset + 4);
-
-            let range_start = offset + 8;
-            let range_end = min(offset + section_size as usize, data.len()); //size includes the header
-            let range = range_start..range_end as usize;
+        for i in 0..header.sections_cnt {
+            if offset + 4 < data.len()
+            {
+                let section_type = str::from_utf8(&data[offset..offset + 4])?.to_string();
+                let section_size = get_u32(&data, offset + 4);
+    
+                let range_start = offset + 8;
+                let range_end = min(offset + section_size as usize, data.len()); //size includes the header
+                let range = range_start..range_end as usize;
+                
+                if let Some(idx) = BMGData::get_idx(&section_type) {
+                    sections[idx] = Some(BMGSection {
+                        section_type : section_type,
+                        size : section_size,
+                        range : range,
+                        data: BMGRawParser::parse_section(data, offset, big_endian)?
+                    });
+                }
             
-            if let Some(idx) = BMGData::get_idx(&section_type) {
-                sections[idx] = Some(BMGSection {
-                    section_type : section_type,
-                    size : section_size,
-                    range : range,
-                    data: BMGRawParser::parse_section(data, offset, big_endian)?
-                });
+                offset += section_size as usize;
+            } else {
+                println!("Invalid offset for section {i}");
             }
-        
-            offset += section_size as usize;
         }
 
         Ok(BMGData { header, sections })

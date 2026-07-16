@@ -7,35 +7,14 @@ mod bmg_message;
 mod utils;
 mod game_configs;
 
-use bmg_message::{Message, Tag, TextPart, LANGUAGES_COUNT};
+use bmg_message::{Message, Tag, TextPart};
 
-use crate::{bmg_message::{MessageParser, MessageSingleLang, get_raw_msg}, game_configs::GameConfig};
-
-
-const BANK_COUNT : usize = 10;
-const FILENAMES : [&str;BANK_COUNT] = [
-    "zel_00",
-    "zel_01",
-    "zel_02",
-    "zel_03",
-    "zel_04",
-    "zel_05",
-    "zel_06",
-    "zel_07",
-    "zel_08",
-    "zel_99",
-];
+use crate::{bmg_message::{MessageParser, MessageSingleLang}, game_configs::GameConfig};
 
 
-// const LANGUAGES : [(&str, &str);LANGUAGES_COUNT] = [
-//     ("jp", "Japanese"),
-//     ("us", "US English"),
-//     ("fr", "French"),
-//     ("de", "German"),
-// ];
+const BANK_COUNT : usize = 32;
 
-
-const COLORS_RGB : [&str; 9] = [
+const DEFAULT_COLORS : [&str; 9] = [
     "#FFFFFF",
     "#f07878",
     "#aadc8c",
@@ -117,7 +96,7 @@ impl Message {
                                                 res_str += "</span>";
                                             }
                                             if new_color != 0 {
-                                                let c = if let Some(conf) = config { (conf.get_color_hex)(new_color)} else { COLORS_RGB[new_color]};
+                                                let c = if let Some(conf) = config { (conf.get_color_hex)(new_color)} else { DEFAULT_COLORS[new_color]};
                                                 res_str += &format!("<span style='color:{};'>", c);
                                             }
                                             current_color = new_color;
@@ -187,7 +166,7 @@ impl Message {
                     match part {
                         TextPart::Text(text) => {
                             if !text.is_empty() {
-                                let config_color = if let Some(conf) = config { (conf.get_color_hex)(current_color)} else { COLORS_RGB[current_color]};
+                                let config_color = if let Some(conf) = config { (conf.get_color_hex)(current_color)} else { DEFAULT_COLORS[current_color]};
                                 let color = if current_color == 0 { default_color } else { Color::from(config_color)};
                                 let size = DEFAULT_SIZE * (current_size as f32/100.0);
                                 let format = Format::new().set_font_color(color).set_font_size(size);
@@ -220,7 +199,7 @@ impl Message {
                                 _ => { 
                                     let s = tag.get_simple_replacement(config).to_string();
                                     if !s.is_empty() {
-                                        let color = if current_color == 0 { default_color } else { Color::from(COLORS_RGB[current_color])};
+                                        let color = if current_color == 0 { default_color } else { Color::from(DEFAULT_COLORS[current_color])};
                                         let size = DEFAULT_SIZE * (current_size as f32/100.0);
                                         let format = Format::new().set_font_color(color).set_font_size(size);
     
@@ -779,25 +758,13 @@ fn main() {
 
     generate_index(Path::new("./www/index.html"));
 
-    let mut parser : BMGParser = Default::default();
-
-    process_config(&mut parser, &game_configs::TP, true);
-    parser.export_html(Path::new("./www/tp.html"), false, &game_configs::TP);
-    parser.export_csv(Path::new("./www/download/tp.csv"), &game_configs::TP);
-    parser.export_xlsx(Path::new("./www/download/tp.xlsx"), false, &game_configs::TP);
-
-    let mut tww_parser = BMGParser::default();
-
-    process_config(&mut tww_parser, &game_configs::TWW, true);
-    tww_parser.export_html(Path::new("./www/tww.html"), false, &game_configs::TWW);
-    tww_parser.export_csv(Path::new("./www/download/tww.csv"), &game_configs::TWW);
-    tww_parser.export_xlsx(Path::new("./www/download/tww.xlsx"), false, &game_configs::TWW);
-    bmg_raw_parser::print_bmg(Path::new("./res/ph/French/battle.bmg"));
-
-    let mut ph = BMGParser::default();
-
-    process_config(&mut ph, &game_configs::PH, true);
-    ph.export_html(Path::new("./www/ph.html"), false, &game_configs::PH);
-    ph.export_csv(Path::new("./www/download/ph.csv"), &game_configs::PH);
-    // ph.export_xlsx(Path::new("./www/download/ph.xlsx"), false, &game_configs::PH);
+    for config in game_configs::ALL_CONFIGS {
+        
+        let id = config.id;
+        let mut parser : BMGParser = Default::default();
+        process_config(&mut parser, &config, true);
+        parser.export_html(Path::new(&format!("./www/{id}.html")), false, &config);
+        parser.export_csv(Path::new(&format!("./www/download/{id}.csv")), &config);
+        parser.export_xlsx(Path::new(&format!("./www/download/{id}.xlsx")), false, &config);
+    }
 }

@@ -371,51 +371,51 @@ pub const PH: GameConfig = GameConfig {
     logo : "https://www.nintendo.com/jp/character/zelda/history/img/branch-d/02/pc/logo.png",
     big_endian : false,
     get_languages : || {
-        const LANGUAGES : [(&str, &str);3] = [
+        const LANGUAGES : [(&str, &str);4] = [
             ("jp", "Japanese"),
             ("us", "English"),
             ("fr", "French"),
             // // ("sp", "Spanish"),
-            // ("de", "German"),
+            ("de", "German"),
             // ("it" "Italian")
         ];
 
         &LANGUAGES
     },
     get_filenames : || {
-        const FILENAMES : [&str;1] = [
+        const FILENAMES : [&str;32] = [
             "battle.bmg",
-            // "battleCommon.bmg",
-            // "bossLast1.bmg",
-            // "bossLast3.bmg",
-            // "brave.bmg",
-            // "collect.bmg",
-            // "demo.bmg",
-            // "field.bmg",
-            // "flame.bmg",
-            // "frost.bmg",
-            // "ghost.bmg",
-            // "hidari.bmg",
-            // "kaitei_F.bmg",
-            // "kaitei.bmg",
-            // "kojima1.bmg",
-            // "kojima2.bmg",
-            // "kojima3.bmg",
-            // "kojima5.bmg",
-            // "main_isl.bmg",
-            // "mainselect.bmg",
-            // "myou.bmg",
-            // "power.bmg",
-            // "regular.bmg",
-            // "sea.bmg",
-            // "sennin.bmg",
-            // "ship.bmg",
-            // "staff.bmg",
-            // "system.bmg",
-            // "torii.bmg",
-            // "wind.bmg",
-            // "wisdom_dngn.bmg",
-            // "wisdom.bmg",
+            "battleCommon.bmg",
+            "bossLast1.bmg", 
+            "bossLast3.bmg", 
+            "brave.bmg", 
+            "collect.bmg",   
+            "demo.bmg",
+            "field.bmg",
+            "flame.bmg",
+            "frost.bmg",
+            "ghost.bmg",
+            "hidari.bmg",
+            "kaitei_F.bmg",
+            "kaitei.bmg",
+            "kojima1.bmg",
+            "kojima2.bmg",
+            "kojima3.bmg",
+            "kojima5.bmg",
+            "main_isl.bmg",
+            "mainselect.bmg",
+            "myou.bmg",
+            "power.bmg",
+            "regular.bmg",
+            "sea.bmg",
+            "sennin.bmg",
+            "ship.bmg",
+            "staff.bmg",
+            "system.bmg",
+            "torii.bmg",
+            "wind.bmg",
+            "wisdom_dngn.bmg",
+            "wisdom.bmg",
         ];
 
         &FILENAMES
@@ -436,8 +436,13 @@ pub const PH: GameConfig = GameConfig {
         COLORS_RGB_TWW[id]
     },
     get_tag_replacement : |tag| {
+        let tag_number = tag.number.swap_bytes();
         match tag.group {
-            0x00 => "[Tag]",
+            0xFE => match tag_number {
+                0x00 => "[Link]",
+                0x0E => "[Number]",
+                _ => "[Unknown_Tag]"
+            },
             _=> ""
         }
     },
