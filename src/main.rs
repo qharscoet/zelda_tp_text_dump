@@ -124,7 +124,7 @@ impl Message {
 
                                             let encoding = config.map(|c| 
                                                 match c.id  {
-                                                   "ph" => encoding_rs::UTF_16LE,
+                                                   "ph" | "st" => encoding_rs::UTF_16LE,
                                                    _ => encoding_rs::SHIFT_JIS, 
                                                 }).unwrap_or(encoding_rs::SHIFT_JIS);
 
@@ -279,7 +279,7 @@ impl Exporter for HTMLExporter  {
         let font =  match &self.config {
             Some(conf) => match conf.id {
                 "tp" => "fot-rodin-prondb",
-                "tww" => "rock",
+                "tww" | "ph" | "st" => "rock",
                 _ => "fot-rodin-prondb"
             }
             None => "fot-rodin-prondb"
@@ -289,7 +289,7 @@ impl Exporter for HTMLExporter  {
         let ruby_font =  match &self.config {
             Some(conf) => match conf.id {
                 "tp" => "reishotai",
-                "tww" => "fot-rodin-prondb",
+                "tww" | "ph" | "st" => "fot-rodin-prondb",
                 _ => "fot-rodin-prondb"
             }
             None => "fot-rodin-prondb"
