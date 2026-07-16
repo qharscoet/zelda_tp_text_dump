@@ -5,8 +5,7 @@ use std::{
 use itertools::Itertools;
 use thiserror::Error;
 
-use crate::bmg_message::{self, MessageAttributes, MessageParser, MessageSingleLang, MessageText, Tag, TextPart};
-use crate::utils::{get_u16, get_u32};
+use crate::{bmg_message::{self, MessageAttributes, MessageParser, MessageSingleLang, MessageText, Tag, TextPart}, bmg_raw_parser::BMGSectionData::INF1, utils::{self, get_u16_be, get_u16_le}};
 
 
 #[derive(Error, Debug)]
@@ -62,26 +61,53 @@ impl DAT1Data {
         
         let encoding = match encoding {
             1 => encoding_rs::WINDOWS_1252,
+            2 => encoding_rs::UTF_16LE, // LE as the only cases we have now are LE, might need to generalise this
             3 => encoding_rs::SHIFT_JIS,
             _ => encoding_rs::WINDOWS_1252, // Default to WINDOWS_1252 if unknown
         };
 
-        let mut it = self.data[offset..].iter().peekable();
+        let mut it = self.data[offset..].iter();
         let mut end = false;
         let mut full_string = String::new();
         let mut text_parts : Vec<TextPart> = Vec::new();
+
+
         while !end {
-            let str_bytes = it.peeking_take_while(|&&b| b!=0x00 && b!=0x1A).map(|b| *b).collect::<Vec<_>>();
+            let mut stop_value = 0u16;
+            let str_bytes = if encoding == encoding_rs::UTF_16LE {
+                
+                // is easier to try to iterate properly by step of 2 bytes without iterator typing weirdness
+                let mut str_end = false;
+                let mut str = Vec::new();
+                while !str_end {
+                    let b1 = *it.next().unwrap();
+                    let b2 = *it.next().unwrap();
+                    let v = get_u16_le(&[b1,b2], 0);
+
+                    if v != 0x00000 && v != 0x001A {
+                        str.push(b1);
+                        str.push(b2);
+                    } else {
+                        stop_value = v;
+                        str_end = true;
+                    }
+                }
+                str
+            } else {
+                it.by_ref().take_while(|&&b| { stop_value = b as u16; b!=0x00 && b!=0x1A }).map(|b| *b).collect::<Vec<_>>()
+            };
+
             let str = encoding.decode(&str_bytes).0;
 
             full_string += &str;
             text_parts.push(TextPart::Text(str.to_string()));
             
-            match it.next().unwrap_or(&0x00) {
+            match stop_value {
                 0x00 => end = true,
                 0x1A => {
                     let size_bytes = it.next().unwrap_or(&0x00);
-                    let text_tag = it.by_ref().take(*size_bytes as usize - 2).map(|b| *b).collect::<Vec<_>>(); //Accounting for the 0x1A and size byte
+                    let payload_size = size_bytes - if encoding == encoding_rs::UTF_16LE { 3 } else {2};
+                    let text_tag = it.by_ref().take(payload_size as usize).map(|b| *b).collect::<Vec<_>>(); //Accounting for the 0x1A and size byte
                     text_parts.push(TextPart::Tag(Tag::from(&text_tag)));
                 },
                 _ => {}
@@ -190,9 +216,9 @@ pub struct BMGRawParser {
 
 
 impl BMGRawParser {
-    fn new(data: Vec<u8>) -> Self {
+    fn new(data: Vec<u8>, big_endian : bool) -> Self {
 
-        let parsed = BMGRawParser::parse_data(&data).unwrap_or_else(|_| BMGData {
+        let parsed = BMGRawParser::parse_data(&data, big_endian).unwrap_or_else(|_| BMGData {
             header: BMGHeader {
                 magic: String::new(),
                 filesize: 0,
@@ -202,6 +228,7 @@ impl BMGRawParser {
             sections: [const { None } ;6],
         });
 
+        
        BMGRawParser { _data : data, data_parsed: parsed}
     }
 
@@ -234,7 +261,7 @@ impl BMGRawParser {
         for section in self.get_sections().iter().flatten() {
             println!("Section type: {}", section.section_type);
             println!("Section size: {}", section.size);
-            println!("Section data range: {:?}", section.range);
+            println!("Section data range: {:X?}", section.range);
 
             match &section.data {
                 BMGSectionData::INF1(INF1Data{count,entry_size, _pad, entries})=> {
@@ -246,7 +273,11 @@ impl BMGRawParser {
                 BMGSectionData::DAT1(dat1data) => {
                     println!("\t DAT1 Section: data length={}", dat1data.data.len());
                     println!("\t First 10 bytes: {:X?}", &dat1data.data[0..10]);
-                    println!("\t First message: {:#?}", dat1data.get_msg_at(1, header.encoding));
+                    if let Some(BMGSectionData::INF1(inf1)) = self.get_section(BMGData::INF1) {
+                        println!("\t First message: {:#?}", dat1data.get_msg_at(inf1.entries[0].offset as usize, header.encoding));
+                        println!("\t Second message: {:#?}", dat1data.get_msg_at(inf1.entries[1].offset as usize, header.encoding));
+                        println!("\t Third message: {:#?}", dat1data.get_msg_at(inf1.entries[2].offset as usize, header.encoding));
+                    }
                 },
                 BMGSectionData::MID1(mid1data) => {
                     println!("\t MID1 Section: count {}", mid1data.count);
@@ -277,7 +308,9 @@ impl BMGRawParser {
     }
 
 
-    fn parse_header(data : &[u8]) -> Result<BMGHeader, BMGParseError> {
+    fn parse_header(data : &[u8], big_endian : bool) -> Result<BMGHeader, BMGParseError> {
+        let get_u32 = if big_endian { utils::get_u32_be } else {utils::get_u32_le};
+
         Ok(BMGHeader {
             magic: str::from_utf8(&data[0..8])?.to_string(),
             filesize: get_u32(&data, 8),
@@ -286,7 +319,11 @@ impl BMGRawParser {
         })
     }
 
-    fn parse_section(data: &[u8], offset: usize) -> Result<BMGSectionData, BMGParseError> {
+    fn parse_section(data: &[u8], offset: usize, big_endian : bool) -> Result<BMGSectionData, BMGParseError> {
+
+        let get_u32 = if big_endian { utils::get_u32_be } else {utils::get_u32_le};
+        let get_u16 = if big_endian { utils::get_u16_be } else {utils::get_u16_le};
+
         let section_type = str::from_utf8(&data[offset..offset + 4])?;
         let section_size = get_u32(&data, offset + 4);
 
@@ -363,29 +400,38 @@ impl BMGRawParser {
 
     }
 
-    fn parse_data(data: &[u8]) -> Result<BMGData, BMGParseError> {
-        let header = BMGRawParser::parse_header(&data)?;
+    fn parse_data(data: &[u8], big_endian : bool) -> Result<BMGData, BMGParseError> {
+        let header = BMGRawParser::parse_header(&data, big_endian)?;
         let mut sections = [const {None}; BMGData::SECTION_COUNT];
         let mut offset = 0x20;
 
-        for _ in 0..header.sections_cnt {
-            let section_type = str::from_utf8(&data[offset..offset + 4])?.to_string();
-            let section_size = get_u32(&data, offset + 4);
+        let get_u32 = if big_endian { utils::get_u32_be } else {utils::get_u32_le};
+        let get_u16 = if big_endian { utils::get_u16_be } else {utils::get_u16_le};
 
-            let range_start = offset + 8;
-            let range_end = min(offset + section_size as usize, data.len()); //size includes the header
-            let range = range_start..range_end as usize;
+        println!("Number of sections : {}", header.sections_cnt);
+        for i in 0..header.sections_cnt {
+            if offset + 4 < data.len()
+            {
+                let section_type = str::from_utf8(&data[offset..offset + 4])?.to_string();
+                let section_size = get_u32(&data, offset + 4);
+    
+                let range_start = offset + 8;
+                let range_end = min(offset + section_size as usize, data.len()); //size includes the header
+                let range = range_start..range_end as usize;
+                
+                if let Some(idx) = BMGData::get_idx(&section_type) {
+                    sections[idx] = Some(BMGSection {
+                        section_type : section_type,
+                        size : section_size,
+                        range : range,
+                        data: BMGRawParser::parse_section(data, offset, big_endian)?
+                    });
+                }
             
-            if let Some(idx) = BMGData::get_idx(&section_type) {
-                sections[idx] = Some(BMGSection {
-                    section_type : section_type,
-                    size : section_size,
-                    range : range,
-                    data: BMGRawParser::parse_section(data, offset)?
-                });
+                offset += section_size as usize;
+            } else {
+                println!("Invalid offset for section {i}");
             }
-        
-            offset += section_size as usize;
         }
 
         Ok(BMGData { header, sections })
@@ -403,10 +449,13 @@ impl BMGRawParser {
                 let attribs = MessageAttributes{payload : inf1_entry.attributes.clone()};
 
                 let id = if let Some(BMGSectionData::MID1(mid1)) = self.get_section(BMGData::MID1) {
-                    mid1.ids[idx]
+                    mid1.ids[idx] as usize
                 } else { 
-                    attribs.get_message_id() as u32
-                 } as usize;
+                    match attribs.get_message_id() {
+                        Some(id) => id as usize,
+                        None => idx +1
+                    }
+                 };
 
                 MessageSingleLang {
                     id : id,
@@ -480,20 +529,29 @@ impl MessageParser for BMGRawParser {
         Vec::new()
        }
     }
+
+    fn get_encoding(&self) -> &'static encoding_rs::Encoding {
+        match self.get_header().encoding {
+            1 => encoding_rs::WINDOWS_1252,
+            2 => encoding_rs::UTF_16LE, // LE as the only cases we have now are LE, might need to generalise this
+            3 => encoding_rs::SHIFT_JIS,
+            _ => encoding_rs::WINDOWS_1252, // Default to WINDOWS_1252 if unknown
+        }
+    }
 }
 
-pub fn open_bmg(filename: &Path) -> Result<BMGRawParser, io::Error> {
+pub fn open_bmg(filename: &Path, big_endian : bool) -> Result<BMGRawParser, io::Error> {
     let mut file = File::open(filename)?;
     let mut buffer = Vec::new();
     file.read_to_end(&mut buffer)?;
 
-    Ok(BMGRawParser::new(buffer))
+    Ok(BMGRawParser::new(buffer, big_endian))
 }
 
 
 #[allow(dead_code)]
 pub fn print_bmg(path : &Path) {
-    match open_bmg(path) {
+    match open_bmg(path, false) {
         Ok(parser) => {
             parser.print();
             // parser.print_flow();

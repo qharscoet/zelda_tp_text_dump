@@ -2,7 +2,7 @@ use std::fmt;
 
 use itertools::Itertools;
 
-use crate::{game_configs::GameConfig, utils::get_u16};
+use crate::{game_configs::GameConfig, utils::get_u16_be};
 
 pub const LANGUAGES_COUNT : usize = 4;
 
@@ -13,8 +13,12 @@ pub struct MessageAttributes {
 
 
 impl MessageAttributes {
-    pub fn get_message_id(&self) -> u16 {
-        get_u16(&self.payload, 0)
+    pub fn get_message_id(&self) -> Option<u16> {
+        if self.payload.len() > 16 { //This should exclude PH
+            Some(get_u16_be(&self.payload, 0))
+        } else {
+            None
+        }
     }
 
     pub fn get_display_style(&self) -> u8 {
@@ -135,7 +139,7 @@ impl From<&Vec<u8>> for Tag {
         if value.len() > 2 {
             Tag {
                 group : value[0],
-                number : get_u16(&value, 0x1),
+                number : get_u16_be(&value, 0x1),
                 payload : Vec::from(&value[0x03..]),
             }
         } else {
@@ -156,4 +160,5 @@ impl fmt::Debug for Tag {
 
 pub trait MessageParser {
     fn get_all_messages(&self) -> Vec<MessageSingleLang>;
+    fn get_encoding(&self) -> &'static encoding_rs::Encoding;
 }
