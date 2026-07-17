@@ -175,15 +175,16 @@ impl Message {
                             }
                         },
                         TextPart::Tag(tag) => {
-                            match tag.group {
-                                0xFF => {
-                                    match tag.number {
-                                        0x00 => { // change color
+                            let get_tag_type = config.map(|c| c.get_tag_type).unwrap_or(game_configs::get_tag_type_default);
+                            match get_tag_type(&tag) {
+                                TagType::Style(style_type) => {
+                                    match style_type {
+                                        StyleTagType::Color => { // change color
                                             //color
     
                                             current_color = tag.payload[0] as usize;
                                         },
-                                        0x01 => {
+                                        StyleTagType::Size => {
     
                                             let big_endian = config.map(|c| c.big_endian).unwrap_or(true);
                                             let get_u16 = if big_endian { utils::get_u16_be } else {utils::get_u16_le};
@@ -191,13 +192,13 @@ impl Message {
                                             current_size = get_u16(&tag.payload, 0);
                                             //Size
                                         },
-                                        0x02 => {
+                                        StyleTagType::Ruby => {
                                             //ruby
                                         },
                                         _ => {}
                                     }
                                 }
-                                _ => { 
+                                TagType::Replace => { 
                                     let s = tag.get_simple_replacement(config).to_string();
                                     if !s.is_empty() {
                                         let color = if current_color == 0 { default_color } else { Color::from(DEFAULT_COLORS[current_color])};
