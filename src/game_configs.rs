@@ -9,6 +9,35 @@ pub struct StyleInfo {
     pub style_id:String
 }
 
+pub enum StyleTagType {
+    Color,
+    Size,
+    Ruby,
+    Unknown
+}
+
+pub enum TagType {
+    Style(StyleTagType),
+    Replace
+}
+
+
+pub fn get_tag_type_default(tag:&Tag) -> TagType {
+    get_tag_type_default_inner(tag.group, tag.number)
+}
+
+fn get_tag_type_default_inner(tag_group : u8, tag_number : u16) -> TagType {
+    match tag_group {
+        0xFF => match tag_number {
+            0x00 => TagType::Style(StyleTagType::Color),
+            0x01 => TagType::Style(StyleTagType::Size),
+            0x02 => TagType::Style(StyleTagType::Ruby),
+            _ => TagType::Style(StyleTagType::Unknown)
+        },
+        _ => TagType::Replace
+    }
+}
+
 #[derive(Clone)]
 pub struct GameConfig {
     pub name: &'static str,
@@ -18,13 +47,14 @@ pub struct GameConfig {
 
     pub get_color_hex: fn(usize) -> &'static str,
     pub get_tag_replacement: fn(&Tag) -> &str,
+    pub get_tag_type : fn(&Tag) -> TagType,
     pub get_message_style : fn(&MessageAttributes) -> StyleInfo,
 
     pub get_languages : fn() -> &'static [(&'static str, &'static str)],
     pub get_filenames : fn() -> &'static [&'static str]
 }
 
-pub const ALL_CONFIGS  : [&GameConfig;4]= [&TP, &TWW, &PH, &ST];
+pub const ALL_CONFIGS  : [&GameConfig;5]= [&TP, &TWW, &PH, &ST, &FSA];
 
 pub const TWW: GameConfig = GameConfig {
     name: "The Wind Waker",
@@ -64,6 +94,9 @@ pub const TWW: GameConfig = GameConfig {
         ];
 
         COLORS_RGB_TWW[id]
+    },
+    get_tag_type : |tag| {
+        get_tag_type_default_inner(tag.group, tag.number)
     },
     get_tag_replacement : |tag| {
         match tag.group {
@@ -217,6 +250,9 @@ pub const TP: GameConfig = GameConfig {
         ];
 
         COLORS_RGB[id]
+    },
+    get_tag_type : |tag| {
+        get_tag_type_default_inner(tag.group, tag.number)
     },
     get_tag_replacement : |tag| {
         match tag.group {
@@ -435,6 +471,9 @@ pub const PH: GameConfig = GameConfig {
 
         COLORS_RGB_TWW[id]
     },
+    get_tag_type : |tag| {
+        get_tag_type_default_inner(tag.group, tag.number.swap_bytes())
+    },
     get_tag_replacement : |tag| {
         let tag_number = tag.number.swap_bytes();
         match tag.group {
@@ -447,10 +486,10 @@ pub const PH: GameConfig = GameConfig {
         }
     },
 
-    get_message_style : |attribs: &MessageAttributes| {
-        let mut centered = false;
-        let mut color = String::new();
-        let mut bg_color = String::new();
+    get_message_style : |_attribs: &MessageAttributes| {
+        let centered = false;
+        let color = String::new();
+        let bg_color = String::new();
         
         // match attribs.payload[0x08] {
         //     0x01 => { bg_color = String::from("#3F48CC");}
@@ -538,6 +577,9 @@ pub const ST: GameConfig = GameConfig {
 
         COLORS_RGB_TWW[id]
     },
+    get_tag_type : |tag| {
+        get_tag_type_default_inner(tag.group, tag.number.swap_bytes())
+    },
     get_tag_replacement : |tag| {
         let tag_number = tag.number.swap_bytes();
         match tag.group {
@@ -550,10 +592,85 @@ pub const ST: GameConfig = GameConfig {
         }
     },
 
-    get_message_style : |attribs: &MessageAttributes| {
-        let mut centered = false;
-        let mut color = String::new();
-        let mut bg_color = String::new();
+    get_message_style : |_attribs: &MessageAttributes| {
+        let centered = false;
+        let color = String::new();
+        let bg_color = String::new();
+        
+        // match attribs.payload[0x08] {
+        //     0x01 => { bg_color = String::from("#3F48CC");}
+        //     0x02 => { bg_color = String::from("#A68752"); color = String::from("#000000");}
+        //     0x06 => { bg_color = String::from("#84795A"); color = String::from("#000000");}
+        //     0x07 => { bg_color = String::from("#BDA273"); color = String::from("#000000");}
+        //     0x09 => { bg_color = String::from("#3F48CC");}
+        //     0x0D => { centered = true; }
+        //     0x0E => { bg_color = String::from("#3F48CC"); }
+        //     _ => {}
+        // }
+        
+        
+        let style_id = String::new();
+
+        StyleInfo { centered, color, bg_color, alt_font : false, style_id }
+    }
+};
+
+pub const FSA: GameConfig = GameConfig {
+    name: "Four Swords Adventures",
+    id: "fsa",
+    logo : "https://www.nintendo.com/jp/character/zelda/history/img/branch-c/03/pc/logo.png",
+    big_endian : true,
+    get_languages : || {
+        const LANGUAGES : [(&str, &str);4] = [
+            ("jp", "Japanese"),
+            ("us", "US English"),
+            ("fr", "French"),
+            // ("sp", "Spanish"),
+            ("de", "German"),
+            // ("it" "Italian")
+        ];
+
+        &LANGUAGES
+    },
+    get_filenames : || {
+        const FILENAMES : [&str;1] = [
+            "gc_four_swords_text.bmg",
+        ];
+
+        &FILENAMES
+    },
+    get_color_hex: |id| {
+        const COLORS_RGB_TWW: [&str; 9] = [
+            "#ffffff",
+            "#ff6400",
+            "#00ff00",
+            "#7878ff",
+            "#ffff3c",
+            "#00ffff",
+            "#ff00ff",
+            "#828282",
+            "#ff8000",
+        ];
+
+        COLORS_RGB_TWW[id]
+    },
+    get_tag_type : |tag| {
+        match tag.group {
+            0x2 => match tag.number {
+                0x1E => TagType::Style(StyleTagType::Color),
+                _ => TagType::Replace
+            },
+            _ => TagType::Replace
+        }
+    },
+    get_tag_replacement : |_tag| {
+        ""
+    },
+
+    get_message_style : |_attribs: &MessageAttributes| {
+        let centered = false;
+        let color = String::new();
+        let bg_color = String::new();
         
         // match attribs.payload[0x08] {
         //     0x01 => { bg_color = String::from("#3F48CC");}
