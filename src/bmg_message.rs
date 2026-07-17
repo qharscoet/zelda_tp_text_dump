@@ -4,8 +4,6 @@ use itertools::Itertools;
 
 use crate::{game_configs::GameConfig, utils::get_u16_be};
 
-pub const LANGUAGES_COUNT : usize = 4;
-
 #[derive(Debug, Default, Clone)]
 pub struct MessageAttributes {
     pub payload : Vec<u8>,
@@ -19,10 +17,6 @@ impl MessageAttributes {
         } else {
             None
         }
-    }
-
-    pub fn get_display_style(&self) -> u8 {
-        self.payload[0x05]
     }
 
     fn _get_printing_style(&self) -> u8 {

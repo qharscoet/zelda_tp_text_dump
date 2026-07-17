@@ -9,7 +9,7 @@ mod game_configs;
 
 use bmg_message::{Message, Tag, TextPart};
 
-use crate::{bmg_message::{MessageParser, MessageSingleLang}, game_configs::GameConfig};
+use crate::{bmg_message::{MessageParser, MessageSingleLang}, game_configs::{GameConfig, StyleTagType, TagType}};
 
 
 const BANK_COUNT : usize = 32;
@@ -86,11 +86,12 @@ impl Message {
                             }
                         },
                         TextPart::Tag(tag) => {
-                            match tag.group {
-                                0xFF => {
-                                    let real_number = if config.map(|c| c.big_endian).unwrap_or(true) { tag.number} else {tag.number.swap_bytes()};
-                                    match real_number {
-                                        0x00 => { // change color
+                            let get_tag_type = config.map(|c| c.get_tag_type).unwrap_or(game_configs::get_tag_type_default);
+                            match get_tag_type(&tag) {
+                                TagType::Style(style_type) => {
+                                    //let real_number = if config.map(|c| c.big_endian).unwrap_or(true) { tag.number} else {tag.number.swap_bytes()};
+                                    match style_type {
+                                        StyleTagType::Color => { // change color
                                             let new_color = tag.payload[0] as usize;
                                             if current_color != 0 {
                                                 res_str += "</span>";
@@ -101,7 +102,7 @@ impl Message {
                                             }
                                             current_color = new_color;
                                         },
-                                        0x01 => {
+                                        StyleTagType::Size => {
     
                                             let big_endian = config.map(|c| c.big_endian).unwrap_or(true);
                                             let get_u16 = if big_endian { utils::get_u16_be } else {utils::get_u16_le};
@@ -116,7 +117,7 @@ impl Message {
                     
                                             current_size = new_size;
                                         },
-                                        0x02 => {
+                                        StyleTagType::Ruby => {
                                             let over_count = tag.payload[0];
                                             let last_is_zero = tag.payload[tag.payload.len() -1] == 0x00;
                                             let slice_end = tag.payload.len() - (last_is_zero as usize);
@@ -136,7 +137,7 @@ impl Message {
                                         _ => {}
                                     }
                                 }
-                                _ => { res_str += tag.get_simple_replacement(config); }
+                                TagType::Replace => { res_str += tag.get_simple_replacement(config); }
                             }
                         }
                     }                
@@ -279,7 +280,7 @@ impl Exporter for HTMLExporter  {
         let font =  match &self.config {
             Some(conf) => match conf.id {
                 "tp" => "fot-rodin-prondb",
-                "tww" | "ph" | "st" => "rock",
+                "tww" | "ph" | "st" | "fsa" => "rock",
                 _ => "fot-rodin-prondb"
             }
             None => "fot-rodin-prondb"
@@ -289,7 +290,7 @@ impl Exporter for HTMLExporter  {
         let ruby_font =  match &self.config {
             Some(conf) => match conf.id {
                 "tp" => "reishotai",
-                "tww" | "ph" | "st" => "fot-rodin-prondb",
+                "tww" | "ph" | "st" | "fsa"  => "fot-rodin-prondb",
                 _ => "fot-rodin-prondb"
             }
             None => "fot-rodin-prondb"
@@ -717,16 +718,14 @@ fn process_file(filename : &Path, lang_id : usize, bank_id : usize, parser : &mu
     Ok(())
 }
 
-fn process_config(parser : &mut BMGParser, config : &GameConfig, use_raw : bool)
+fn process_config(parser : &mut BMGParser, config : &GameConfig)
 {
     for (lang_idx, lang) in (config.get_languages)().iter().enumerate() {
-        //process_language(lang_idx,lang.0, parser, true);
+
         let str_path = &format!("./res/{}/{}", config.id, lang.1);
         let folder_path = Path::new(&str_path);
 
         for (bank_id,&basename) in (config.get_filenames)().iter().enumerate() {
-
-            //let filename = basename.to_owned() + if use_raw {".bmg"} else {".txt"};
             let _ = process_file(&folder_path.join(&basename), lang_idx, bank_id, parser, config.big_endian);
         }
     }
@@ -762,7 +761,7 @@ fn main() {
         
         let id = config.id;
         let mut parser : BMGParser = Default::default();
-        process_config(&mut parser, &config, true);
+        process_config(&mut parser, &config);
         parser.export_html(Path::new(&format!("./www/{id}.html")), false, &config);
         parser.export_csv(Path::new(&format!("./www/download/{id}.csv")), &config);
         parser.export_xlsx(Path::new(&format!("./www/download/{id}.xlsx")), false, &config);

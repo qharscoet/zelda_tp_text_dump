@@ -2,10 +2,9 @@ use std::{
     cmp::min, fmt::{self}, fs::File, io::{self, Read}, ops::Range, path::Path, str::Utf8Error,
 };
 
-use itertools::Itertools;
 use thiserror::Error;
 
-use crate::{bmg_message::{self, MessageAttributes, MessageParser, MessageSingleLang, MessageText, Tag, TextPart}, bmg_raw_parser::BMGSectionData::INF1, utils::{self, get_u16_be, get_u16_le}};
+use crate::{bmg_message::{self, MessageAttributes, MessageParser, MessageSingleLang, MessageText, Tag, TextPart}, utils::{self}};
 
 
 #[derive(Error, Debug)]
@@ -82,7 +81,7 @@ impl DAT1Data {
                 while !str_end {
                     let b1 = *it.next().unwrap();
                     let b2 = *it.next().unwrap();
-                    let v = get_u16_le(&[b1,b2], 0);
+                    let v = utils::get_u16_le(&[b1,b2], 0);
 
                     if v != 0x00000 && v != 0x001A {
                         str.push(b1);
@@ -406,7 +405,6 @@ impl BMGRawParser {
         let mut offset = 0x20;
 
         let get_u32 = if big_endian { utils::get_u32_be } else {utils::get_u32_le};
-        let get_u16 = if big_endian { utils::get_u16_be } else {utils::get_u16_le};
 
         println!("Number of sections : {}", header.sections_cnt);
         for i in 0..header.sections_cnt {
