@@ -397,7 +397,12 @@ pub const TP: GameConfig = GameConfig {
             _ => {}
         }
 
-        StyleInfo { centered, color, bg_color : String::new(), alt_font, style_id : String::new() }
+        let style_id = match attribs.payload[0x05] {
+            0x00 | 0x0D |0x0E => format!("display-{}", attribs.payload[0x05]),
+            _  => String::new()
+        };
+
+        StyleInfo { centered, color, bg_color : String::new(), alt_font, style_id }
     }
 };
 
