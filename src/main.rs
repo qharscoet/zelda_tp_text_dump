@@ -1,15 +1,18 @@
 use std::{fmt, fs::File, io::{self, Write}, path::Path};
 use rust_xlsxwriter::{Color, Format, FormatAlign};
 
+mod message;
+
 mod bmg_raw_parser;
 mod bmg_text_parser;
-mod bmg_message;
+mod msbt_parser;
+
 mod utils;
 mod game_configs;
 
-use bmg_message::{Message, Tag, TextPart};
+use message::{Message, Tag, TextPart};
 
-use crate::{bmg_message::{MessageParser, MessageSingleLang}, game_configs::{GameConfig, StyleTagType, TagType}};
+use crate::{message::{MessageParser, MessageSingleLang}, game_configs::{GameConfig, StyleTagType, TagType}};
 
 
 const BANK_COUNT : usize = 32;
@@ -220,7 +223,7 @@ impl Message {
 
     fn get_raw(&self, lang_id : usize, config : Option<&GameConfig>) -> String {
         if self.text.len() > lang_id {
-            bmg_message::get_raw_msg(&self.text[lang_id], config)
+            message::get_raw_msg(&self.text[lang_id], config)
         } else {
             String::new()
         }
@@ -706,6 +709,7 @@ fn process_file(filename : &Path, lang_id : usize, bank_id : usize, parser : &mu
     let p : Box<dyn MessageParser> = match filename.extension().and_then(|s| s.to_str()) {
         Some("txt") => Box::new(bmg_text_parser::open_bmg(filename)?),
         Some("bmg") => Box::new(bmg_raw_parser::open_bmg(filename, big_endian)?),
+        Some("msbt") => Box::new(msbt_parser::open_msbt(filename)?),
         None => todo!(),
         _ => todo!()
     };
@@ -767,4 +771,8 @@ fn main() {
         parser.export_csv(Path::new(&format!("./www/download/{id}.csv")), &config);
         parser.export_xlsx(Path::new(&format!("./www/download/{id}.xlsx")), false, &config);
     }
+
+
+    msbt_parser::print_msbt(Path::new("./res/albw/French/Common.msbt"));
+
 }

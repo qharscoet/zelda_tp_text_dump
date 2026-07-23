@@ -1,4 +1,4 @@
-use crate::bmg_message::{MessageAttributes, Tag};
+use crate::message::{MessageAttributes, Tag};
 
 #[derive(Default)]
 pub struct StyleInfo {
